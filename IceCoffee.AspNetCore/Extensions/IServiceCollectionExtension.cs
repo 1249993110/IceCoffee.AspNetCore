@@ -93,14 +93,23 @@ namespace IceCoffee.AspNetCore.Extensions
         /// 添加 Jwt 授权策略到 IServiceCollection
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="requireHttpMethods"></param>
         /// <returns></returns>
-        public static IServiceCollection AddJwtAuthorization(this IServiceCollection services, bool requireHttpMethods = false)
+        public static IServiceCollection AddJwtAuthorization(this IServiceCollection services)
+        {
+            return services.AddJwtAuthorization(new PermissionRequirement());
+        }
+
+        /// <summary>
+        /// 添加 Jwt 授权策略到 IServiceCollection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="permissionRequirement"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddJwtAuthorization(this IServiceCollection services, PermissionRequirement permissionRequirement)
         {
             // 添加授权处理器（默认添加微信和PC），这里不能使用 TryAdd，否则只会添加一个 IAuthorizationHandler
             services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, JwtAuthorizationHandler>());
 
-            var permissionRequirement = new PermissionRequirement() { RequireHttpMethods = requireHttpMethods };
             services.AddSingleton(permissionRequirement);
 
             // 添加授权策略服务

@@ -39,7 +39,7 @@ namespace IceCoffee.AspNetCore.Controllers
             };
         }
 
-        protected virtual Response PaginationQueryResult(object items, long total)
+        protected virtual Response PaginationQueryResult(object items, uint total)
         {
             return new Response()
             {

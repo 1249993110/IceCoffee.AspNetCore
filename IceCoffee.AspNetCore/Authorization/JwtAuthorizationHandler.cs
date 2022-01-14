@@ -23,6 +23,15 @@ namespace IceCoffee.AspNetCore.Authorization
         {
             try
             {
+                if(requirement.PrependedAuthorization != null)
+                {
+                    if(requirement.PrependedAuthorization.Invoke(context) == false)
+                    {
+                        context.Fail();
+                        return Task.CompletedTask;
+                    }
+                }
+
                 if (context.Resource is HttpContext httpContext)
                 {
                     var routeData = httpContext.GetRouteData();

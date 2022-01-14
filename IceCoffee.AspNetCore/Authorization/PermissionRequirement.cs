@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using System.ComponentModel;
 
 namespace IceCoffee.AspNetCore.Authorization
 {
@@ -8,8 +9,14 @@ namespace IceCoffee.AspNetCore.Authorization
     public class PermissionRequirement : IAuthorizationRequirement
     {
         /// <summary>
+        /// 前置授权
+        /// </summary>
+        public Func<AuthorizationHandlerContext, bool>? PrependedAuthorization { get; set; }
+
+        /// <summary>
         /// 要求 HttpMethods 授权
         /// </summary>
+        [DefaultValue(false)]
         public bool RequireHttpMethods { get; set; }
     }
 }

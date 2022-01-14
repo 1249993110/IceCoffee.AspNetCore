@@ -31,7 +31,7 @@ namespace IceCoffee.AspNetCore.Middlewares
         }
 
         /// <summary>
-        /// AspNetCore的管道执行至ExceptionHandlerMiddleware时，捕获其他中间件异常
+        /// AspNetCore 的管道执行至 ExceptionHandlerMiddleware 时，捕获其他中间件异常
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace IceCoffee.AspNetCore.Middlewares
                 {
                     Code = CustomStatusCode.InternalServerError,
                     Title = nameof(CustomStatusCode.InternalServerError),
-                    Message = "An error occured. Please contact the administrator",
+                    Message = ex.Message,
                     Data = new InternalServerErrorResult()
                     {
                         RequestId = requestId,

@@ -1,22 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<Product>IceCoffee</Product>
-		<Description>A simple AspNetCore library</Description>
-		<Copyright>Copyright (c) 2022 IceCoffee</Copyright>
-		<PackageProjectUrl>https://github.com/1249993110/IceCoffee.AspNetCore</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<Authors>IceCoffee</Authors>
 		<Company>LuoShuiTianYi</Company>
-		<Version>1.0.0.0</Version>
+		<Copyright>Copyright (c) 2022 IceCoffee</Copyright>
+		<Description>A simple AspNetCore library</Description>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<NoWarn>$(NoWarn);1591</NoWarn>
 		<Nullable>enable</Nullable>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/1249993110/IceCoffee.AspNetCore</PackageProjectUrl>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Product>IceCoffee</Product>
+		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
+		<TargetFramework>net6.0</TargetFramework>
+		<Version>1.0.0.6</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -34,6 +34,7 @@
 			<Pack>True</Pack>
 			<PackagePath></PackagePath>
 		</None>
+		<None Include="..\README.md" />
 	</ItemGroup>
 
 	<ItemGroup>

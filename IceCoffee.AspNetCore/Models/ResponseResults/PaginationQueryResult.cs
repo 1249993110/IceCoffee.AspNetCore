@@ -9,12 +9,12 @@ namespace IceCoffee.AspNetCore.Models.ResponseResults
         /// <summary>
         /// 结果总条数
         /// </summary>
-        public long Total { get; set; }
+        public uint Total { get; set; }
 
         /// <summary>
         /// 结果项
         /// </summary>
-        public object Items { get; set; }
+        public object? Items { get; set; }
     }
 
     public class PaginationQueryResult<T>
@@ -22,11 +22,11 @@ namespace IceCoffee.AspNetCore.Models.ResponseResults
         /// <summary>
         /// 结果总条数
         /// </summary>
-        public long Total { get; set; }
+        public uint Total { get; set; }
 
         /// <summary>
         /// 结果项
         /// </summary>
-        public T Items { get; set; }
+        public T? Items { get; set; }
     }
 }
