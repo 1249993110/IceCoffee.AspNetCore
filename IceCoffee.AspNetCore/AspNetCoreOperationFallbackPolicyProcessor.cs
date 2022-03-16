@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Namotion.Reflection;
 using NSwag;
 using NSwag.Generation.AspNetCore;
@@ -13,12 +14,15 @@ using System.Text;
 namespace IceCoffee.AspNetCore
 {
     /// <summary>Generates the Http fallback policy for an operation by reflecting the AuthorizeAttribute attributes.</summary>
+    /// <remarks>
+    /// 实现所有方法无需添加 <see cref="AuthorizeAttribute"/> 也会被加入Swagger文档
+    /// </remarks>
     public class AspNetCoreOperationFallbackPolicyProcessor : IOperationProcessor
     {
         private readonly string _name;
 
         /// <summary>Initializes a new instance of the <see cref="OperationSecurityScopeProcessor"/> class with 'Bearer' name.</summary>
-        public AspNetCoreOperationFallbackPolicyProcessor() : this("Bearer")
+        public AspNetCoreOperationFallbackPolicyProcessor() : this(JwtBearerDefaults.AuthenticationScheme)
         {
         }
 
@@ -34,11 +38,9 @@ namespace IceCoffee.AspNetCore
         /// <returns>true if the operation should be added to the Swagger specification.</returns>
         public bool Process(OperationProcessorContext context)
         {
-            var aspNetCoreContext = context as AspNetCoreOperationProcessorContext;
-
-            var endpointMetadata = aspNetCoreContext?.ApiDescription?.ActionDescriptor?.TryGetPropertyValue<IList<object>>("EndpointMetadata");
-            if (endpointMetadata != null)
+            if(context is AspNetCoreOperationProcessorContext aspNetCoreContext)
             {
+                var endpointMetadata = aspNetCoreContext.ApiDescription.ActionDescriptor.EndpointMetadata;
                 var allowAnonymous = endpointMetadata.OfType<AllowAnonymousAttribute>().Any();
                 if (allowAnonymous)
                 {
@@ -61,9 +63,11 @@ namespace IceCoffee.AspNetCore
                 {
                     { _name, Enumerable.Empty<string>() }
                 });
+
+                return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

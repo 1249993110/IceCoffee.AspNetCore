@@ -10,6 +10,6 @@ namespace IceCoffee.AspNetCore.Authentication
     /// </summary>
     public class ApiKeyAuthenticationSchemeOptions : AuthenticationSchemeOptions
     {
-        public string AccessToken { get; set; }
+        public string? AccessToken { get; set; }
     }
 }

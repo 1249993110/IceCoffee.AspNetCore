@@ -1,16 +1,14 @@
 ﻿using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Models.Primitives;
-using IceCoffee.AspNetCore.Models.ResponseResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IceCoffee.AspNetCore.Controllers
 {
     public class ApiControllerBase : ControllerBase
     {
         #region SucceededResult
+
         protected virtual Response SucceededResult()
         {
             return new Response()
@@ -19,15 +17,17 @@ namespace IceCoffee.AspNetCore.Controllers
                 Title = nameof(CustomStatusCode.OK)
             };
         }
-        protected virtual Response SucceededResult(object data, string title = nameof(CustomStatusCode.OK))
+
+        protected virtual Response SucceededResult(object data)
         {
             return new Response()
             {
                 Code = CustomStatusCode.OK,
-                Title = title,
+                Title = nameof(CustomStatusCode.OK),
                 Data = data
             };
         }
+
         protected virtual Response SucceededResult(object data, string message, string title = nameof(CustomStatusCode.OK))
         {
             return new Response()
@@ -45,12 +45,14 @@ namespace IceCoffee.AspNetCore.Controllers
             {
                 Code = CustomStatusCode.OK,
                 Title = nameof(CustomStatusCode.OK),
-                Data = new PaginationQueryResult() { Items = items, Total = total }
+                Data = new Resp_PaginationQuery() { Items = items, Total = total }
             };
         }
-        #endregion
+
+        #endregion SucceededResult
 
         #region FailedResult
+
         protected virtual Response FailedResult(string message, string title = nameof(CustomStatusCode.BadRequest))
         {
             return new Response()
@@ -60,6 +62,7 @@ namespace IceCoffee.AspNetCore.Controllers
                 Message = message
             };
         }
+
         protected virtual Response FailedResult(object data, string message, string title = nameof(CustomStatusCode.BadRequest))
         {
             return new Response()
@@ -70,7 +73,19 @@ namespace IceCoffee.AspNetCore.Controllers
                 Message = message
             };
         }
-        #endregion
 
+        #endregion FailedResult
+
+        #region ForbiddenResult
+        protected virtual Response ForbiddenResult(string? message = null, string title = nameof(CustomStatusCode.Forbidden))
+        {
+            return new Response()
+            {
+                Code = CustomStatusCode.Forbidden,
+                Title = title,
+                Message = message
+            };
+        }
+        #endregion ForbiddenResult
     }
 }

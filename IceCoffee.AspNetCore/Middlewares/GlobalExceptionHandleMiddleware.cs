@@ -1,17 +1,11 @@
 ﻿using IceCoffee.AspNetCore.Extensions;
 using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Models.Primitives;
-using IceCoffee.AspNetCore.Models.ResponseResults;
 using IceCoffee.Common;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics;
-using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace IceCoffee.AspNetCore.Middlewares
 {
@@ -45,16 +39,16 @@ namespace IceCoffee.AspNetCore.Middlewares
             catch (Exception ex)
             {
                 var response = context.Response;
-                response.ContentType = HttpHelper.ContentTypes.Json;
+                response.ContentType = "application/json";
                 response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 string requestId = context.GetRequestId();
-                var result = new Response<InternalServerErrorResult>()
+                var result = new Response<Resp_InternalServerError>()
                 {
                     Code = CustomStatusCode.InternalServerError,
                     Title = nameof(CustomStatusCode.InternalServerError),
                     Message = ex.Message,
-                    Data = new InternalServerErrorResult()
+                    Data = new Resp_InternalServerError()
                     {
                         RequestId = requestId,
                         IpAddress = context.GetRemoteIpAddress()

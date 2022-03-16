@@ -1,20 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-namespace IceCoffee.AspNetCore.Models.RequestParams
+namespace IceCoffee.AspNetCore.Models
 {
     /// <summary>
     /// 分页查询参数
     /// </summary>
-    public class PaginationQueryParam
+    public class Req_PaginationQuery
     {
         /// <summary>
         /// 页码
         /// </summary>
+        [DefaultValue(1)]
         public int PageIndex { get; set; } = 1;
 
         /// <summary>
-        /// 每页数量
+        /// 每页数量，值小于 0 时返回所有记录
         /// </summary>
+        [DefaultValue(10)]
         public int PageSize { get; set; } = 10;
 
         /// <summary>

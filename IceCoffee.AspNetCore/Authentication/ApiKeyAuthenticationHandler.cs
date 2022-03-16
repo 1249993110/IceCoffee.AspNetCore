@@ -59,7 +59,8 @@ namespace IceCoffee.AspNetCore.Authentication
                 return Task.FromResult(AuthenticateResult.Success(_authTicket));
             }
 
-            return Task.FromResult(AuthenticateResult.Fail("Unauthenticated"));
+            return Task.FromResult(AuthenticateResult.NoResult());
+            //return Task.FromResult(AuthenticateResult.Fail("Unauthenticated"));
         }
     }
 }

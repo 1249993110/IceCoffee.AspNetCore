@@ -16,19 +16,7 @@ namespace IceCoffee.AspNetCore.Extensions
 
         public static string? GetRemoteIpAddress(this HttpContext httpContext)
         {
-            return httpContext.Connection.RemoteIpAddress?.ToString();
-        }
-
-        public static string? GetRemoteEndPoint(this HttpContext httpContext)
-        {
-            var remoteEndPoint = httpContext.Connection.RemoteIpAddress;
-
-            if(remoteEndPoint == null)
-            {
-                return null;
-            }
-
-            return new IPEndPoint(remoteEndPoint, httpContext.Connection.RemotePort).ToString();
+            return httpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
         }
     }
 }

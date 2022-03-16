@@ -28,7 +28,7 @@ namespace IceCoffee.AspNetCore.Extensions
         /// <param name="services"></param>
         /// <param name="jwtOptionsSection"></param>
         /// <returns></returns>
-        public static AuthenticationBuilder AddJwtAuthentication(this IServiceCollection services, IConfiguration jwtOptionsSection)
+        public static AuthenticationBuilder AddJwtAuthentication(this IServiceCollection services, IConfigurationSection jwtOptionsSection)
         {
             services.Configure<JwtOptions>(jwtOptionsSection);
             var jwtOptions = jwtOptionsSection.Get<JwtOptions>();
@@ -78,6 +78,8 @@ namespace IceCoffee.AspNetCore.Extensions
 
             return services.AddAuthentication(options =>
             {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
@@ -108,7 +110,7 @@ namespace IceCoffee.AspNetCore.Extensions
         public static IServiceCollection AddJwtAuthorization(this IServiceCollection services, PermissionRequirement permissionRequirement)
         {
             // 添加授权处理器（默认添加微信和PC），这里不能使用 TryAdd，否则只会添加一个 IAuthorizationHandler
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, JwtAuthorizationHandler>());
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, AuthorizationHandler>());
 
             services.AddSingleton(permissionRequirement);
 
@@ -155,32 +157,11 @@ namespace IceCoffee.AspNetCore.Extensions
         /// </summary>
         /// <param name="services"></param>
         /// <param name="smtpOptionsSection"></param>
-        public static void AddEmailService(this IServiceCollection services, IConfiguration smtpOptionsSection)
+        public static void AddEmailService(this IServiceCollection services, IConfigurationSection smtpOptionsSection)
         {
             services.Configure<SmtpOptions>(smtpOptionsSection);
             services.TryAddSingleton<EmailService>();
         }
 
-        /// <summary>
-        /// 配置可写入的Options
-        /// </summary>
-        /// <typeparam name="TOptions"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="section"></param>
-        /// <param name="file"></param>
-        public static void ConfigureWritable<TOptions>(
-            this IServiceCollection services,
-            IConfigurationSection section,
-            string file = "appsettings.json") where TOptions : class, new()
-        {
-            services.Configure<TOptions>(section);
-            services.TryAddSingleton<IWritableOptions<TOptions>>(provider =>
-            {
-                var environment = provider.GetRequiredService<IWebHostEnvironment>();
-                var options = provider.GetRequiredService<IOptionsMonitor<TOptions>>();
-                string path = Path.Combine(environment.ContentRootPath, file);
-                return new WritableOptions<TOptions>(options, section.Key, path);
-            });
-        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IceCoffee.AspNetCore
 {
-    public struct HttpMethods
+    public struct HttpMethod
     {
         public const string Any = "*";
 

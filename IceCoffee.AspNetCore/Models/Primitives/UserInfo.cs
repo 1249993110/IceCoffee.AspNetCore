@@ -7,39 +7,42 @@ using System.Text;
 
 namespace IceCoffee.AspNetCore.Models.Primitives
 {
-    public class UserInfoBase
+    /// <summary>
+    /// 用户信息
+    /// </summary>
+    public class UserInfo
     {
         /// <summary>
         /// 用户Id
         /// </summary>
-        public string? UserId;
+        public Guid? UserId { get; set; }
 
         /// <summary>
         /// 用户名
         /// </summary>
-        public string? UserName;
+        public string? UserName { get; set; }
 
         /// <summary>
         /// 显示名称
         /// </summary>
-        public string? DisplayName;
+        public string? DisplayName { get; set; }
 
         /// <summary>
         /// 角色名
         /// </summary>
-        public string[]? RoleNames;
+        public string[]? RoleNames { get; set; }
 
         /// <summary>
         /// Email
         /// </summary>
-        public string? Email;
+        public string? Email { get; set; }
 
         /// <summary>
         /// 电话号码
         /// </summary>
         public string? PhoneNumber;
 
-        public UserInfoBase()
+        public UserInfo()
         {
         }
 
@@ -47,14 +50,14 @@ namespace IceCoffee.AspNetCore.Models.Primitives
         /// 从声明初始化实例
         /// </summary>
         /// <param name="claims"></param>
-        public UserInfoBase(IEnumerable<Claim> claims)
+        public UserInfo(IEnumerable<Claim> claims)
         {
             foreach (var claim in claims)
             {
                 switch (claim.Type)
                 {
                     case JwtRegisteredClaimNames.UserId:
-                        UserId = claim.Value;
+                        UserId = Guid.Parse(claim.Value);
                         break;
                     case JwtRegisteredClaimNames.UserName:
                         UserName = claim.Value;
@@ -75,16 +78,16 @@ namespace IceCoffee.AspNetCore.Models.Primitives
             }
         }
 
-        public virtual List<Claim> ToClaims()
+        private List<Claim> InternalToClaims()
         {
             var claims = new List<Claim>();
 
-            if(this.UserId != null)
+            if (this.UserId.HasValue)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.UserId, this.UserId));
+                claims.Add(new Claim(JwtRegisteredClaimNames.UserId, this.UserId.Value.ToString()));
             }
 
-            if(this.UserName != null)
+            if (this.UserName != null)
             {
                 claims.Add(new Claim(JwtRegisteredClaimNames.UserName, this.UserName));
             }
@@ -107,6 +110,38 @@ namespace IceCoffee.AspNetCore.Models.Primitives
             if (this.PhoneNumber != null)
             {
                 claims.Add(new Claim(JwtRegisteredClaimNames.PhoneNumber, this.PhoneNumber));
+            }
+
+            return claims;
+        }
+
+        /// <summary>
+        /// 转换为声明
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<Claim> ToClaims()
+        {
+            return InternalToClaims();
+        }
+
+        /// <summary>
+        /// 转换为声明
+        /// </summary>
+        /// <param name="areas">附加的区域</param>
+        /// <param name="httpMethods">附加的Http方法</param>
+        /// <returns></returns>
+        public virtual List<Claim> ToClaims(IEnumerable<string> areas, IEnumerable<string> httpMethods)
+        {
+            var claims = InternalToClaims();
+
+            if(areas != null)
+            {
+                claims.Add(new Claim(JwtRegisteredClaimNames.Areas, string.Join(',', areas)));
+            }
+
+            if (httpMethods != null)
+            {
+                claims.Add(new Claim(JwtRegisteredClaimNames.HttpMethods, string.Join(';', httpMethods)));
             }
 
             return claims;

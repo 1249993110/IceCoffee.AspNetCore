@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace IceCoffee.AspNetCore.Models.ResponseResults
+namespace IceCoffee.AspNetCore.Models
 {
-    public class InternalServerErrorResult
+    public class Resp_InternalServerError
     {
         /// <summary>
         /// 请求Id

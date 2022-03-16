@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using IceCoffee.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
@@ -6,13 +7,13 @@ using Microsoft.Extensions.Logging;
 namespace IceCoffee.AspNetCore.Authorization
 {
     /// <summary>
-    /// Jwt 授权处理器
+    /// 全局授权处理器
     /// </summary>
-    public class JwtAuthorizationHandler : AuthorizationHandler<PermissionRequirement>
+    public class AuthorizationHandler : AuthorizationHandler<PermissionRequirement>
     {
-        private readonly ILogger<JwtAuthorizationHandler> _logger;
+        private readonly ILogger<AuthorizationHandler> _logger;
 
-        public JwtAuthorizationHandler(ILogger<JwtAuthorizationHandler> logger)
+        public AuthorizationHandler(ILogger<AuthorizationHandler> logger)
         {
             this._logger = logger;
         }
@@ -23,13 +24,17 @@ namespace IceCoffee.AspNetCore.Authorization
         {
             try
             {
-                if(requirement.PrependedAuthorization != null)
+                var identity = context.User.Identity;
+                if (identity == null || identity.IsAuthenticated == false)
                 {
-                    if(requirement.PrependedAuthorization.Invoke(context) == false)
-                    {
-                        context.Fail();
-                        return Task.CompletedTask;
-                    }
+                    context.Fail();
+                    return Task.CompletedTask;
+                }
+
+                if(identity.AuthenticationType == AuthenticationSchemes.ApiKeyAuthenticationSchemeName)
+                {
+                    context.Succeed(requirement);
+                    return Task.CompletedTask;
                 }
 
                 if (context.Resource is HttpContext httpContext)

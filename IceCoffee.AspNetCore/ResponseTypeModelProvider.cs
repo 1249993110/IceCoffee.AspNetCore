@@ -1,14 +1,9 @@
 ﻿using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Models.Primitives;
-using IceCoffee.AspNetCore.Models.ResponseResults;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IceCoffee.AspNetCore
 {
@@ -66,7 +61,7 @@ namespace IceCoffee.AspNetCore
                         action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status403Forbidden));
                     }
 
-                    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response<InternalServerErrorResult>), StatusCodes.Status500InternalServerError));
+                    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response<Resp_InternalServerError>), StatusCodes.Status500InternalServerError));
                 }
             }
         }

@@ -20,6 +20,11 @@ namespace IceCoffee.AspNetCore.Models.Primitives
         BadRequest = 400,
 
         /// <summary>
+        /// 未授权
+        /// </summary>
+        Forbidden = 403,
+
+        /// <summary>
         /// 内部服务器错误
         /// </summary>
         InternalServerError = 500

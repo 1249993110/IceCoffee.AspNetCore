@@ -35,6 +35,22 @@ namespace IceCoffee.AspNetCore.Services
                     throw new ArgumentNullException(nameof(emailSendParam));
                 }
 
+                if (string.IsNullOrEmpty(emailSendParam.FromAddress))
+                {
+                    throw new ArgumentNullException(nameof(EmailSendOptions.FromAddress));
+                }
+
+
+                if (string.IsNullOrEmpty(emailSendParam.ToAddress))
+                {
+                    throw new ArgumentNullException(nameof(EmailSendOptions.ToAddress));
+                }
+
+                if (string.IsNullOrEmpty(emailSendParam.TemplateFilePath))
+                {
+                    throw new ArgumentNullException(nameof(EmailSendOptions.TemplateFilePath));
+                }
+
                 // 初始化发送邮件对象
                 var client = new SmtpClient(_smtpOptions.Host, _smtpOptions.Port)
                 {
@@ -68,7 +84,7 @@ namespace IceCoffee.AspNetCore.Services
                 // 收件人（可以多个）
                 email.To.Add(emailSendParam.ToAddress);
 
-                AsyncCompletedEventArgs result = null;
+                AsyncCompletedEventArgs? result = null;
 
                 // 发送完毕事件（只针对异步发送有效）
                 client.SendCompleted += (sender, e) =>
