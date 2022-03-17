@@ -39,7 +39,7 @@ namespace IceCoffee.AspNetCore
                     if (existStatus200 == false)
                     {
                         Type returnType = action.ActionMethod.ReturnType;
-                        // If actions type are Task<RespResult<ReturnType>>
+                        // If actions type are Task<Response<ReturnType>>
                         if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
                         {
                             returnType = returnType.GenericTypeArguments[0];

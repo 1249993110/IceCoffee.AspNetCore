@@ -27,6 +27,6 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 结果项
         /// </summary>
-        public T? Items { get; set; }
+        public IEnumerable<T>? Items { get; set; }
     }
 }

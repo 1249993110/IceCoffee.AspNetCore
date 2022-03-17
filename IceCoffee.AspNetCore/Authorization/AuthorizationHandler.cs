@@ -43,7 +43,7 @@ namespace IceCoffee.AspNetCore.Authorization
 
                     if (routeData.Values.TryGetValue("area", out var area))
                     {
-                        string? areas = context.User.FindFirst(Jwt.JwtRegisteredClaimNames.Areas)?.Value;
+                        string? areas = context.User.FindFirst(RegisteredClaimNames.Areas)?.Value;
                         if (areas == null)
                         {
                             context.Fail();
@@ -71,7 +71,7 @@ namespace IceCoffee.AspNetCore.Authorization
 
                         if (requirement.RequireHttpMethods)
                         {
-                            string? httpMethods = context.User.FindFirst(Jwt.JwtRegisteredClaimNames.HttpMethods)?.Value;
+                            string? httpMethods = context.User.FindFirst(RegisteredClaimNames.HttpMethods)?.Value;
                             if (httpMethods == null)
                             {
                                 context.Fail();

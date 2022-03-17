@@ -1,5 +1,4 @@
-﻿using IceCoffee.AspNetCore.Jwt;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
@@ -56,22 +55,22 @@ namespace IceCoffee.AspNetCore.Models.Primitives
             {
                 switch (claim.Type)
                 {
-                    case JwtRegisteredClaimNames.UserId:
+                    case RegisteredClaimNames.UserId:
                         UserId = Guid.Parse(claim.Value);
                         break;
-                    case JwtRegisteredClaimNames.UserName:
+                    case RegisteredClaimNames.UserName:
                         UserName = claim.Value;
                         break;
-                    case JwtRegisteredClaimNames.DisplayName:
+                    case RegisteredClaimNames.DisplayName:
                         DisplayName = claim.Value;
                         break;
-                    case JwtRegisteredClaimNames.RoleNames:
+                    case RegisteredClaimNames.RoleNames:
                         RoleNames = claim.Value.Split(',');
                         break;
-                    case JwtRegisteredClaimNames.Email:
+                    case RegisteredClaimNames.Email:
                         Email = claim.Value;
                         break;
-                    case JwtRegisteredClaimNames.PhoneNumber:
+                    case RegisteredClaimNames.PhoneNumber:
                         PhoneNumber = claim.Value;
                         break;
                 }
@@ -84,32 +83,32 @@ namespace IceCoffee.AspNetCore.Models.Primitives
 
             if (this.UserId.HasValue)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.UserId, this.UserId.Value.ToString()));
+                claims.Add(new Claim(RegisteredClaimNames.UserId, this.UserId.Value.ToString()));
             }
 
             if (this.UserName != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.UserName, this.UserName));
+                claims.Add(new Claim(RegisteredClaimNames.UserName, this.UserName));
             }
 
             if (this.DisplayName != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.DisplayName, this.DisplayName));
+                claims.Add(new Claim(RegisteredClaimNames.DisplayName, this.DisplayName));
             }
 
             if (this.RoleNames != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.RoleNames, string.Join(',', this.RoleNames)));
+                claims.Add(new Claim(RegisteredClaimNames.RoleNames, string.Join(',', this.RoleNames)));
             }
 
             if (this.Email != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.Email, this.Email));
+                claims.Add(new Claim(RegisteredClaimNames.Email, this.Email));
             }
 
             if (this.PhoneNumber != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.PhoneNumber, this.PhoneNumber));
+                claims.Add(new Claim(RegisteredClaimNames.PhoneNumber, this.PhoneNumber));
             }
 
             return claims;
@@ -136,12 +135,12 @@ namespace IceCoffee.AspNetCore.Models.Primitives
 
             if(areas != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.Areas, string.Join(',', areas)));
+                claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', areas)));
             }
 
             if (httpMethods != null)
             {
-                claims.Add(new Claim(JwtRegisteredClaimNames.HttpMethods, string.Join(';', httpMethods)));
+                claims.Add(new Claim(RegisteredClaimNames.HttpMethods, string.Join(';', httpMethods)));
             }
 
             return claims;
