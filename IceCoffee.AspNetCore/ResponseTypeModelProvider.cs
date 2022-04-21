@@ -19,7 +19,7 @@ namespace IceCoffee.AspNetCore
         {
             foreach (ControllerModel controller in context.Result.Controllers)
             {
-                bool controllerAllowAnonymous = controller.Attributes.Any(p => p is AllowAnonymousAttribute);
+                //bool controllerAllowAnonymous = controller.Attributes.Any(p => p is AllowAnonymousAttribute);
                 foreach (ActionModel action in controller.Actions)
                 {
                     bool existStatus200 = false;
@@ -55,11 +55,11 @@ namespace IceCoffee.AspNetCore
 
                     action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response), StatusCodes.Status400BadRequest));
 
-                    if (controllerAllowAnonymous == false && action.Attributes.Any(p => p is AllowAnonymousAttribute) == false)
-                    {
-                        action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status401Unauthorized));
-                        action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status403Forbidden));
-                    }
+                    //if (controllerAllowAnonymous == false && action.Attributes.Any(p => p is AllowAnonymousAttribute) == false)
+                    //{
+                    //    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status401Unauthorized));
+                    //    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status403Forbidden));
+                    //}
 
                     action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response<Resp_InternalServerError>), StatusCodes.Status500InternalServerError));
                 }
