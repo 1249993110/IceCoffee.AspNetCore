@@ -1,6 +1,4 @@
 ﻿using IceCoffee.AspNetCore.Models;
-using IceCoffee.AspNetCore.Models.Primitives;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IceCoffee.AspNetCore.Controllers
@@ -45,7 +43,7 @@ namespace IceCoffee.AspNetCore.Controllers
             {
                 Code = CustomStatusCode.OK,
                 Title = nameof(CustomStatusCode.OK),
-                Data = new Resp_PaginationQuery() { Items = items, Total = total }
+                Data = new PaginationQueryResult() { Items = items, Total = total }
             };
         }
 

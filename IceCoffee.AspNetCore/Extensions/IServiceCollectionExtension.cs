@@ -1,22 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using IceCoffee.AspNetCore.Authorization;
+using IceCoffee.AspNetCore.Options;
+using IceCoffee.AspNetCore.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
-using IceCoffee.AspNetCore.Models;
-using IceCoffee.AspNetCore.Authorization;
-using IceCoffee.AspNetCore.Services;
-using Microsoft.Extensions.Options;
-using IceCoffee.AspNetCore.Options;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using IceCoffee.AspNetCore.Models.Primitives;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace IceCoffee.AspNetCore.Extensions
 {
@@ -44,7 +37,7 @@ namespace IceCoffee.AspNetCore.Extensions
         /// <returns></returns>
         public static AuthenticationBuilder AddJwtAuthentication(IServiceCollection services, JwtOptions jwtOptions)
         {
-            if(jwtOptions.SecretKey == null)
+            if (jwtOptions.SecretKey == null)
             {
                 throw new Exception("The SecretKey can not be null");
             }
@@ -85,7 +78,7 @@ namespace IceCoffee.AspNetCore.Extensions
             {
                 // default is true
                 options.RequireHttpsMetadata = false;
-                // default is true, 将 jwtToken 保存到当前的 HttpContext, 以通过 await HttpContext.GetTokenAsync("Bearer","access_token"); 获取它 
+                // default is true, 将 jwtToken 保存到当前的 HttpContext, 以通过 await HttpContext.GetTokenAsync("Bearer","access_token"); 获取它
                 options.SaveToken = false;
                 options.TokenValidationParameters = tokenValidationParams;
             });
@@ -162,6 +155,5 @@ namespace IceCoffee.AspNetCore.Extensions
             services.Configure<SmtpOptions>(smtpOptionsSection);
             services.TryAddSingleton<EmailService>();
         }
-
     }
 }

@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using System;
 using System.Diagnostics;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
-namespace IceCoffee.AspNetCore.Models.Primitives
+namespace IceCoffee.AspNetCore.Models
 {
     public interface IResponse : IConvertToActionResult
     {
@@ -39,7 +35,7 @@ namespace IceCoffee.AspNetCore.Models.Primitives
         [DebuggerStepThrough]
         IActionResult IConvertToActionResult.Convert()
         {
-            return new JsonResult(this) 
+            return new JsonResult(this)
             {
                 StatusCode = (int)Code
             };

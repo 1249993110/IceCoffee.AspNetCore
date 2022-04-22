@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Security.Claims;
-using System.Text;
+﻿using System.Security.Claims;
 
-namespace IceCoffee.AspNetCore.Models.Primitives
+namespace IceCoffee.AspNetCore.Models
 {
     /// <summary>
     /// 用户信息
@@ -58,18 +54,23 @@ namespace IceCoffee.AspNetCore.Models.Primitives
                     case RegisteredClaimNames.UserId:
                         UserId = Guid.Parse(claim.Value);
                         break;
+
                     case RegisteredClaimNames.UserName:
                         UserName = claim.Value;
                         break;
+
                     case RegisteredClaimNames.DisplayName:
                         DisplayName = claim.Value;
                         break;
+
                     case RegisteredClaimNames.RoleNames:
                         RoleNames = claim.Value.Split(',');
                         break;
+
                     case RegisteredClaimNames.Email:
                         Email = claim.Value;
                         break;
+
                     case RegisteredClaimNames.PhoneNumber:
                         PhoneNumber = claim.Value;
                         break;
@@ -133,7 +134,7 @@ namespace IceCoffee.AspNetCore.Models.Primitives
         {
             var claims = InternalToClaims();
 
-            if(areas != null)
+            if (areas != null)
             {
                 claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', areas)));
             }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IceCoffee.AspNetCore.Models.Primitives
+﻿namespace IceCoffee.AspNetCore.Models
 {
     /// <summary>
     /// 控制器中的自定义状态代码

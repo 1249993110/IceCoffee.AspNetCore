@@ -1,7 +1,5 @@
 ﻿using IceCoffee.AspNetCore.Extensions;
 using IceCoffee.AspNetCore.Models;
-using IceCoffee.AspNetCore.Models.Primitives;
-using IceCoffee.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -43,12 +41,12 @@ namespace IceCoffee.AspNetCore.Middlewares
                 response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 string requestId = context.GetRequestId();
-                var result = new Response<Resp_InternalServerError>()
+                var result = new Response<InternalServerError>()
                 {
                     Code = CustomStatusCode.InternalServerError,
                     Title = nameof(CustomStatusCode.InternalServerError),
                     Message = ex.Message,
-                    Data = new Resp_InternalServerError()
+                    Data = new InternalServerError()
                     {
                         RequestId = requestId,
                         IpAddress = context.GetRemoteIpAddress()

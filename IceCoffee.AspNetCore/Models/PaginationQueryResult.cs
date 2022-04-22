@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IceCoffee.AspNetCore.Models
+﻿namespace IceCoffee.AspNetCore.Models
 {
-    public class Resp_PaginationQuery
+    /// <summary>
+    /// 分页查询结果
+    /// </summary>
+    public class PaginationQueryResult
     {
         /// <summary>
         /// 结果总条数
@@ -17,7 +16,11 @@ namespace IceCoffee.AspNetCore.Models
         public object? Items { get; set; }
     }
 
-    public class Resp_PaginationQuery<T>
+    /// <summary>
+    /// 分页查询结果
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class PaginationQueryResult<T>
     {
         /// <summary>
         /// 结果总条数

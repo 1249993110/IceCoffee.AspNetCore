@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace IceCoffee.AspNetCore.Models
 {
-    public class Resp_InternalServerError
+    public class InternalServerError
     {
         /// <summary>
         /// 请求Id
@@ -14,7 +11,7 @@ namespace IceCoffee.AspNetCore.Models
         public string? RequestId { get; set; }
 
         /// <summary>
-        /// Ip地址 
+        /// Ip地址
         /// </summary>
         [JsonPropertyName("ipAddress")]
         public string? IpAddress { get; set; }

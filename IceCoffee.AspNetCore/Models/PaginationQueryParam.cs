@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace IceCoffee.AspNetCore.Models
 {
     /// <summary>
     /// 分页查询参数
     /// </summary>
-    public class Req_PaginationQuery
+    public class PaginationQueryParam
     {
         /// <summary>
         /// 页码
