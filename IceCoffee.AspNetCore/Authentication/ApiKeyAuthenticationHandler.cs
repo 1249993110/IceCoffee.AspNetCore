@@ -53,8 +53,17 @@ namespace IceCoffee.AspNetCore.Authentication
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
-            if (string.IsNullOrEmpty(Options.AccessToken) ||
-                (Context.Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken))
+            if (string.IsNullOrEmpty(Options.AccessToken))
+            {
+                return Task.FromResult(AuthenticateResult.Success(_authTicket));
+            }
+
+            if(Context.Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken)
+            {
+                return Task.FromResult(AuthenticateResult.Success(_authTicket));
+            }
+
+            if (Context.Request.Query[HttpRequestHeaderName] == Options.AccessToken)
             {
                 return Task.FromResult(AuthenticateResult.Success(_authTicket));
             }
