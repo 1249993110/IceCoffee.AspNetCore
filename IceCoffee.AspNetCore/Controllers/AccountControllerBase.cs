@@ -15,9 +15,9 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <summary>
         /// 通过 Cookie 登录, 默认开启滑动过期, 窗口期7天
         /// </summary>
-        protected virtual async Task SignInWithCookie(IEnumerable<Claim> claims, AuthenticationProperties? authenticationProperties = null)
+        protected virtual async Task SignInWithCookie(UserInfo userInfo, AuthenticationProperties? authenticationProperties = null)
         {
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme,
+            var claimsIdentity = new ClaimsIdentity(userInfo.ToClaims(), CookieAuthenticationDefaults.AuthenticationScheme,
                     RegisteredClaimNames.UserName, RegisteredClaimNames.RoleNames);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
@@ -69,7 +69,7 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <param name="accessToken">访问令牌</param>
         /// <param name="storedRefreshToken">存储的刷新令牌</param>
         /// <remarks>
-        /// 令牌验证失败将抛出响应异常
+        /// 令牌验证失败将抛出相应异常
         /// </remarks>
         /// <returns></returns>
         protected virtual async Task<JwtToken> RefreshToken(string accessToken, StoredRefreshToken storedRefreshToken)
