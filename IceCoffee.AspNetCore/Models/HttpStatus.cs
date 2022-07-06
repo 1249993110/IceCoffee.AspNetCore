@@ -3,7 +3,7 @@
     /// <summary>
     /// 控制器中的自定义状态代码
     /// </summary>
-    public enum CustomStatusCode : short
+    public enum HttpStatus : short
     {
         /// <summary>
         /// 成功

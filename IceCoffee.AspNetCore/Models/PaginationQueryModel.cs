@@ -5,7 +5,7 @@ namespace IceCoffee.AspNetCore.Models
     /// <summary>
     /// 分页查询参数
     /// </summary>
-    public class PaginationQueryParam
+    public class PaginationQueryModel
     {
         /// <summary>
         /// 页码

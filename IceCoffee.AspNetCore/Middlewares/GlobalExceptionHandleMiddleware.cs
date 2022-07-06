@@ -41,21 +41,27 @@ namespace IceCoffee.AspNetCore.Middlewares
                 response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 string requestId = context.GetRequestId();
-                var result = new Response<InternalServerError>()
+
+#pragma warning disable CS8601 // 引用类型赋值可能为 null。
+                var result = new Response()
                 {
-                    Code = CustomStatusCode.InternalServerError,
-                    Title = nameof(CustomStatusCode.InternalServerError),
-                    Message = ex.Message,
-                    Data = new InternalServerError()
+                    Status = HttpStatus.InternalServerError,
+                    Error = new InternalServerError() 
                     {
                         RequestId = requestId,
-                        IpAddress = context.GetRemoteIpAddress()
+                        Message = ex.Message,
+                        Details = new string[] { ex.GetType().FullName, ex.Source, ex.StackTrace }
                     }
                 };
+#pragma warning restore CS8601 // 引用类型赋值可能为 null。
 
                 await JsonSerializer.SerializeAsync(response.Body, result);
 
-                _logger.LogError(ex, "The exception is caught in the global exception handling middleware, requestId: " + requestId);
+                var path = context.Request.Path;
+
+                _logger.LogError(ex, 
+                    "The exception is caught in the global exception handling middleware, requestId: {requestId}, path: {path}"
+                    , requestId, path);
             }
         }
     }

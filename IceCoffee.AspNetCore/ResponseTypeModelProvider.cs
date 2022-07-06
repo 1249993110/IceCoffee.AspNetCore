@@ -42,8 +42,7 @@ namespace IceCoffee.AspNetCore
                         {
                             returnType = returnType.GenericTypeArguments[0];
                         }
-
-                        if (returnType == typeof(IResponse))
+                        else if (returnType == typeof(IResponse))
                         {
                             returnType = typeof(Response);
                         }
@@ -51,7 +50,7 @@ namespace IceCoffee.AspNetCore
                         action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
                     }
 
-                    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response), StatusCodes.Status400BadRequest));
+                    //action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response), StatusCodes.Status400BadRequest));
 
                     //if (controllerAllowAnonymous == false && action.Attributes.Any(p => p is AllowAnonymousAttribute) == false)
                     //{
@@ -59,7 +58,7 @@ namespace IceCoffee.AspNetCore
                     //    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(int), StatusCodes.Status403Forbidden));
                     //}
 
-                    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response<InternalServerError>), StatusCodes.Status500InternalServerError));
+                    //action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response<InternalServerError>), StatusCodes.Status500InternalServerError));
                 }
             }
         }

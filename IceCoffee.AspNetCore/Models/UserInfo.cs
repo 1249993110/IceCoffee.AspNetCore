@@ -35,7 +35,17 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 电话号码
         /// </summary>
-        public string? PhoneNumber;
+        public string? PhoneNumber { get; set; }
+
+        /// <summary>
+        /// 授权的区域
+        /// </summary>
+        public string[]? Areas { get; set; }
+
+        /// <summary>
+        /// 授权的 HttpMethods
+        /// </summary>
+        public string[]? HttpMethods { get; set; }
 
         public UserInfo()
         {
@@ -74,11 +84,23 @@ namespace IceCoffee.AspNetCore.Models
                     case RegisteredClaimNames.PhoneNumber:
                         PhoneNumber = claim.Value;
                         break;
+
+                    case RegisteredClaimNames.Areas:
+                        Areas = claim.Value.Split(',');
+                        break;
+
+                    case RegisteredClaimNames.HttpMethods:
+                        HttpMethods = claim.Value.Split(';');
+                        break;
                 }
             }
         }
 
-        private List<Claim> InternalToClaims()
+        /// <summary>
+        /// 转换为声明
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<Claim> ToClaims()
         {
             var claims = new List<Claim>();
 
@@ -112,36 +134,14 @@ namespace IceCoffee.AspNetCore.Models
                 claims.Add(new Claim(RegisteredClaimNames.PhoneNumber, this.PhoneNumber));
             }
 
-            return claims;
-        }
-
-        /// <summary>
-        /// 转换为声明
-        /// </summary>
-        /// <returns></returns>
-        public virtual List<Claim> ToClaims()
-        {
-            return InternalToClaims();
-        }
-
-        /// <summary>
-        /// 转换为声明
-        /// </summary>
-        /// <param name="areas">附加的区域</param>
-        /// <param name="httpMethods">附加的Http方法</param>
-        /// <returns></returns>
-        public virtual List<Claim> ToClaims(IEnumerable<string> areas, IEnumerable<string> httpMethods)
-        {
-            var claims = InternalToClaims();
-
-            if (areas != null)
+            if (this.Areas != null)
             {
-                claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', areas)));
+                claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', this.Areas)));
             }
 
-            if (httpMethods != null)
+            if (this.HttpMethods != null)
             {
-                claims.Add(new Claim(RegisteredClaimNames.HttpMethods, string.Join(';', httpMethods)));
+                claims.Add(new Claim(RegisteredClaimNames.HttpMethods, string.Join(';', this.HttpMethods)));
             }
 
             return claims;

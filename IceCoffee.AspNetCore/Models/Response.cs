@@ -12,57 +12,41 @@ namespace IceCoffee.AspNetCore.Models
     /// <summary>
     /// 响应基类
     /// </summary>
-    public abstract class ResponseBase : IResponse
+    public class Response : IResponse
     {
         /// <summary>
         /// 状态码
         /// </summary>
-        [JsonPropertyName("code")]
-        public CustomStatusCode Code { get; set; }
+        [JsonPropertyName("status")]
+        public HttpStatus Status { get; set; }
 
         /// <summary>
         /// 标题
         /// </summary>
-        [JsonPropertyName("title")]
-        public string? Title { get; set; }
-
-        /// <summary>
-        /// 消息
-        /// </summary>
-        [JsonPropertyName("message")]
-        public string? Message { get; set; }
+        [JsonPropertyName("error")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Error? Error { get; set; }
 
         [DebuggerStepThrough]
         IActionResult IConvertToActionResult.Convert()
         {
             return new JsonResult(this)
             {
-                StatusCode = (int)Code
+                StatusCode = (int)Status
             };
         }
     }
 
     /// <summary>
-    /// 响应
-    /// </summary>
-    public class Response : ResponseBase
-    {
-        /// <summary>
-        /// 数据
-        /// </summary>
-        [JsonPropertyName("data")]
-        public object? Data { get; set; }
-    }
-
-    /// <summary>
     /// 泛型响应
     /// </summary>
-    public class Response<TData> : ResponseBase
+    public class Response<TData> : Response
     {
         /// <summary>
         /// 数据
         /// </summary>
         [JsonPropertyName("data")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public TData? Data { get; set; }
     }
 }
