@@ -72,7 +72,7 @@ namespace IceCoffee.AspNetCore.Controllers
         /// 令牌验证失败将抛出相应异常
         /// </remarks>
         /// <returns></returns>
-        protected virtual async Task<JwtToken> RefreshToken(string accessToken, StoredRefreshToken storedRefreshToken)
+        protected virtual async Task<JwtToken> RefreshToken(string accessToken, StoredRefreshToken? storedRefreshToken)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             SecurityToken? validatedToken = null;
