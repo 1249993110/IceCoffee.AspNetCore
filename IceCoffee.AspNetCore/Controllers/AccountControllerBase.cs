@@ -66,7 +66,7 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <summary>
         /// 刷新令牌
         /// </summary>
-        /// <param name="accessToken">访问令牌</param>
+        /// <param name="accessToken">已过期的访问令牌</param>
         /// <param name="storedRefreshToken">存储的刷新令牌</param>
         /// <remarks>
         /// 令牌验证失败将抛出相应异常
@@ -148,7 +148,7 @@ namespace IceCoffee.AspNetCore.Controllers
         }
 
         /// <summary>
-        /// 生成 JwtToken
+        /// 生成 JwtToken, 覆盖此方法以更改到期时间跨度
         /// </summary>
         /// <param name="tokenValidationParams"></param>
         /// <param name="userInfo"></param>
@@ -156,7 +156,7 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <param name="accessTokenExpiryTimeSpan">默认 10 分钟</param>
         /// <param name="refreshTokenExpiryTimeSpan">默认 30 天</param>
         /// <returns></returns>
-        protected static async Task<JwtToken> GenerateJwtToken(
+        protected virtual async Task<JwtToken> GenerateJwtToken(
             TokenValidationParameters tokenValidationParams,
             UserInfo userInfo,
             Func<StoredRefreshToken, Task>? storeRefreshToken = null,
