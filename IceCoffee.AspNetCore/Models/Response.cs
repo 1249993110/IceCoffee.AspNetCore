@@ -5,14 +5,10 @@ using System.Text.Json.Serialization;
 
 namespace IceCoffee.AspNetCore.Models
 {
-    public interface IResponse : IConvertToActionResult
-    {
-    }
-
     /// <summary>
     /// 响应基类
     /// </summary>
-    public class Response : IResponse
+    public class Response : IConvertToActionResult
     {
         /// <summary>
         /// 状态码

@@ -16,7 +16,7 @@ namespace IceCoffee.AspNetCore
 
         private static Type GetType(Type type)
         {
-            if (typeof(IResponse).IsAssignableFrom(type))
+            if (type.GetGenericTypeDefinition() == typeof(Response<>))
             {
                 return type;
             }

@@ -42,10 +42,6 @@ namespace IceCoffee.AspNetCore
                         {
                             returnType = returnType.GenericTypeArguments[0];
                         }
-                        else if (returnType == typeof(IResponse))
-                        {
-                            returnType = typeof(Response);
-                        }
 
                         action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
                     }
