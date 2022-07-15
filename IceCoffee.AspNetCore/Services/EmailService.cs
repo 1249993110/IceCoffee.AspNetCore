@@ -56,7 +56,7 @@ namespace IceCoffee.AspNetCore.Services
                 {
                     // 是否启用SSL
                     EnableSsl = _smtpOptions.EnableSsl,
-                    // 是否启用身份验证（UseDefaultCredentials属性必须要在Credentials前配置，否则会报错）
+                    // 是否启用身份验证（UseDefaultCredentials属性必须要在Credentials前配置, 否则会报错）
                     UseDefaultCredentials = _smtpOptions.UseDefaultCredentials,
                     // 配置身份账号密码
                     Credentials = new NetworkCredential(_smtpOptions.UserName, _smtpOptions.Password)

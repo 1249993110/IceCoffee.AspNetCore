@@ -23,7 +23,7 @@ namespace IceCoffee.AspNetCore.Middlewares
         }
 
         /// <summary>
-        /// AspNetCore 的管道执行至 ExceptionHandlerMiddleware 时，捕获其他中间件异常
+        /// AspNetCore 的管道执行至 ExceptionHandlerMiddleware 时, 捕获其他中间件异常
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>

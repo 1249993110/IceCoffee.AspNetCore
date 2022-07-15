@@ -28,7 +28,7 @@ namespace IceCoffee.AspNetCore.Authentication
             // 身份证
             var claimsIdentity = new ClaimsIdentity(claims, AuthenticationSchemes.ApiKeyAuthenticationSchemeName);
 
-            // 表示一个人，把身份证给这个人
+            // 表示一个人, 把身份证给这个人
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
             // 将凭证与人关联
@@ -49,7 +49,7 @@ namespace IceCoffee.AspNetCore.Authentication
         {
             if (Context.GetEndpoint()?.Metadata.GetMetadata<IAllowAnonymous>() != null)
             {
-                // 返回 Fail 会写一条 Info 日志，参考asp框架默认实现，其在没有 cookie 时也返回 NoResult
+                // 返回 Fail 会写一条 Info 日志, 参考asp框架默认实现, 其在没有 cookie 时也返回 NoResult
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 

@@ -1,11 +1,22 @@
 ﻿using IceCoffee.AspNetCore.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IceCoffee.AspNetCore.Controllers
 {
     public class ApiControllerBase : ControllerBase
     {
+        public UserInfo UserInfo => HttpContext.RequestServices.GetService<UserInfo>() ?? new UserInfo(HttpContext.User.Claims);
+
         #region SucceededResult
+
+        protected virtual Response SucceededResult()
+        {
+            return new Response()
+            {
+                Status = HttpStatus.OK
+            };
+        }
 
         protected virtual Response<TData> SucceededResult<TData>()
         {
@@ -34,6 +45,15 @@ namespace IceCoffee.AspNetCore.Controllers
                     Items = items, 
                     Total = total 
                 }
+            };
+        }
+
+        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(PaginationQueryResult<TItems> paginationQueryResult)
+        {
+            return new Response<PaginationQueryResult<TItems>>()
+            {
+                Status = HttpStatus.OK,
+                Data = paginationQueryResult
             };
         }
 

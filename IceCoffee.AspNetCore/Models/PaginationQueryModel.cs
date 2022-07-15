@@ -14,7 +14,7 @@ namespace IceCoffee.AspNetCore.Models
         public int PageIndex { get; set; } = 1;
 
         /// <summary>
-        /// 每页数量，值小于 0 时返回所有记录
+        /// 每页数量, 值小于 0 时返回所有记录
         /// </summary>
         [DefaultValue(10)]
         public int PageSize { get; set; } = 10;

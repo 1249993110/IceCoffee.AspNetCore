@@ -15,7 +15,7 @@ namespace IceCoffee.AspNetCore
 {
     /// <summary>Generates the Http fallback policy for an operation by reflecting the AuthorizeAttribute attributes.</summary>
     /// <remarks>
-    /// 实现所有方法无需添加 <see cref="AuthorizeAttribute"/> 也会被加入Swagger文档
+    /// 实现所有非匿名方法无需添加 <see cref="AuthorizeAttribute"/> 也会在 Swagger 文档中要求认证授权
     /// </remarks>
     public class AspNetCoreOperationFallbackPolicyProcessor : IOperationProcessor
     {
@@ -38,7 +38,7 @@ namespace IceCoffee.AspNetCore
         /// <returns>true if the operation should be added to the Swagger specification.</returns>
         public bool Process(OperationProcessorContext context)
         {
-            if(context is AspNetCoreOperationProcessorContext aspNetCoreContext)
+            if (context is AspNetCoreOperationProcessorContext aspNetCoreContext)
             {
                 var endpointMetadata = aspNetCoreContext.ApiDescription.ActionDescriptor.EndpointMetadata;
                 var allowAnonymous = endpointMetadata.OfType<AllowAnonymousAttribute>().Any();

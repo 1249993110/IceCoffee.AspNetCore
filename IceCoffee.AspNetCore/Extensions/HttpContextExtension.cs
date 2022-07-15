@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using IceCoffee.AspNetCore.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
-using System.Net;
-using System.Text;
 
 namespace IceCoffee.AspNetCore.Extensions
 {
@@ -17,6 +16,11 @@ namespace IceCoffee.AspNetCore.Extensions
         public static string? GetRemoteIpAddress(this HttpContext httpContext)
         {
             return httpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+        }
+
+        public static string? GetCulture(this HttpContext httpContext)
+        {
+            return httpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name;
         }
     }
 }

@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace IceCoffee.AspNetCore
 {
+    /// <summary>
+    /// 响应状态码及类型提供者
+    /// </summary>
     public class ResponseTypeModelProvider : IApplicationModelProvider
     {
         public int Order => 1024;
@@ -37,16 +40,23 @@ namespace IceCoffee.AspNetCore
                     if (existStatus200 == false)
                     {
                         Type returnType = action.ActionMethod.ReturnType;
+
                         // If actions type are Task<Response<ReturnType>>
                         if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
                         {
+                            // get the generic type
                             returnType = returnType.GenericTypeArguments[0];
+                        }
+
+                        if (returnType == typeof(Response))
+                        {
+                            returnType = typeof(IResponse);
                         }
 
                         action.Filters.Add(new ProducesResponseTypeAttribute(returnType, StatusCodes.Status200OK));
                     }
 
-                    //action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response), StatusCodes.Status400BadRequest));
+                    action.Filters.Add(new ProducesResponseTypeAttribute(typeof(Response), StatusCodes.Status400BadRequest));
 
                     //if (controllerAllowAnonymous == false && action.Attributes.Any(p => p is AllowAnonymousAttribute) == false)
                     //{

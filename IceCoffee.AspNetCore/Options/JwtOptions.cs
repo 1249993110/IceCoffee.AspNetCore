@@ -47,8 +47,8 @@ namespace IceCoffee.AspNetCore.Options
         public string? ValidAudience { get; set; }
 
         /// <summary>
-        /// 缓冲过期时间，总的有效时间等于这个时间加上jwt的过期时间
-        /// 默认允许 300s 的时间偏移量，设置为0即可
+        /// 缓冲过期时间, 总的有效时间等于这个时间加上jwt的过期时间
+        /// 默认允许 300s 的时间偏移量, 设置为0即可
         /// </summary>
         [DefaultValue(0)]
         public int ClockSkew { get; set; }

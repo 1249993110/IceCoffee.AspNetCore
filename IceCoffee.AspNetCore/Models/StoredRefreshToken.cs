@@ -37,7 +37,7 @@ namespace IceCoffee.AspNetCore.Models
         public bool IsRevorked { get; set; }
 
         /// <summary>
-        /// Refresh Token 的生命周期很长，可以长达数月。注意一个Refresh Token只能被用来刷新一次
+        /// Refresh Token 的生命周期很长, 可以长达数月。注意一个Refresh Token只能被用来刷新一次
         /// </summary>
         public DateTime ExpiryDate { get; set; }
     }

@@ -10,27 +10,42 @@ using System.Security.Claims;
 
 namespace IceCoffee.AspNetCore.Controllers
 {
+    
     public class AccountControllerBase : ApiControllerBase
     {
         /// <summary>
-        /// 通过 Cookie 登录, 默认开启滑动过期, 窗口期7天
+        /// 通过 Cookie 登录
         /// </summary>
-        protected virtual async Task SignInWithCookie(UserInfo userInfo, AuthenticationProperties? authenticationProperties = null)
+        protected virtual async Task SignInWithCookie(UserInfo userInfo, bool rememberMe = true)
         {
-            var claimsIdentity = new ClaimsIdentity(userInfo.ToClaims(), CookieAuthenticationDefaults.AuthenticationScheme,
-                    RegisteredClaimNames.UserName, RegisteredClaimNames.RoleNames);
-            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
             var utcNow = DateTimeOffset.UtcNow;
-            var properties = authenticationProperties ?? new AuthenticationProperties()
+
+            var properties = new AuthenticationProperties()
             {
                 IssuedUtc = utcNow,
                 AllowRefresh = true,
-                IsPersistent = true,
+                IsPersistent = rememberMe,
                 ExpiresUtc = utcNow.AddDays(7),
             };
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, properties);
+            await SignInWithCookie(userInfo, properties);
+        }
+
+
+        /// <summary>
+        /// 通过 Cookie 登录, 默认开启滑动过期, 窗口期7天
+        /// </summary>
+        protected virtual async Task SignInWithCookie(UserInfo userInfo, AuthenticationProperties authenticationProperties)
+        {
+            var claimsIdentity = new ClaimsIdentity(
+                userInfo.ToClaims(), 
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                RegisteredClaimNames.UserName, 
+                RegisteredClaimNames.RoleNames);
+
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal, authenticationProperties);
         }
 
         /// <summary>
@@ -39,7 +54,6 @@ namespace IceCoffee.AspNetCore.Controllers
         protected virtual async Task SignOutWithCookie()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            HttpContext.Session.Clear();
         }
 
         /// <summary>
@@ -49,17 +63,16 @@ namespace IceCoffee.AspNetCore.Controllers
         protected virtual async Task<JwtToken> SignInWithJwt(UserInfo userInfo)
         {
             var tokenValidationParams = HttpContext.RequestServices.GetRequiredService<TokenValidationParameters>();
-            return await GenerateJwtToken(tokenValidationParams, userInfo);
+            return await GenerateJwtToken(userInfo);
         }
 
         /// <summary>
         /// 通过 JWT 注销
         /// </summary>
-        /// <returns></returns>
+        /// <returns>jwtId</returns>
         protected virtual Task<string> SignOutWithJwt()
         {
             string jwtId = User.Claims.First(p => p.Type == JwtRegisteredClaimNames.Jti).Value;
-            HttpContext.Session.Clear();
             return Task.FromResult(jwtId);
         }
 
@@ -82,7 +95,7 @@ namespace IceCoffee.AspNetCore.Controllers
             try
             {
                 // Validation 1 - Validation JWT token format
-                // 此验证功能将确保 Token 满足验证参数，并且它是一个真正的 token 而不仅仅是随机字符串
+                // 此验证功能将确保 Token 满足验证参数, 并且它是一个真正的 token 而不仅仅是随机字符串
 
                 var tokenInVerification = jwtTokenHandler.ValidateToken(accessToken, tokenValidationParams, out validatedToken);
 
@@ -105,7 +118,7 @@ namespace IceCoffee.AspNetCore.Controllers
                     }
 
                     // validation 3 - validate existence of the token
-                    // 验证 refresh token 是否存在，是否是保存在数据库的 refresh token
+                    // 验证 refresh token 是否存在, 是否是保存在数据库的 refresh token
                     if (storedRefreshToken == null)
                     {
                         throw new Exception("刷新令牌不存在");
@@ -115,7 +128,7 @@ namespace IceCoffee.AspNetCore.Controllers
                     // Check the date of the saved refresh token if it has expired
                     if (DateTime.Now > storedRefreshToken.ExpiryDate)
                     {
-                        throw new Exception("刷新令牌已过期，用户需要重新登录");
+                        throw new Exception("刷新令牌已过期, 用户需要重新登录");
                     }
 
                     // Validation 6 - validate if revoked
@@ -134,7 +147,7 @@ namespace IceCoffee.AspNetCore.Controllers
 
                     var userInfo = new UserInfo(jwtSecurityToken.Claims);
                     // 生成一个新的 token
-                    return await GenerateJwtToken(tokenValidationParams, userInfo);
+                    return await GenerateJwtToken(userInfo);
                 }
             }
             catch (CustomExceptionBase)
@@ -150,19 +163,19 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <summary>
         /// 生成 JwtToken, 覆盖此方法以更改到期时间跨度
         /// </summary>
-        /// <param name="tokenValidationParams"></param>
         /// <param name="userInfo"></param>
         /// <param name="storeRefreshToken"></param>
         /// <param name="accessTokenExpiryTimeSpan">默认 10 分钟</param>
         /// <param name="refreshTokenExpiryTimeSpan">默认 30 天</param>
         /// <returns></returns>
         protected virtual async Task<JwtToken> GenerateJwtToken(
-            TokenValidationParameters tokenValidationParams,
             UserInfo userInfo,
             Func<StoredRefreshToken, Task>? storeRefreshToken = null,
             TimeSpan? accessTokenExpiryTimeSpan = null,
             TimeSpan? refreshTokenExpiryTimeSpan = null)
         {
+            var tokenValidationParams = HttpContext.RequestServices.GetRequiredService<TokenValidationParameters>();
+
             var claims = userInfo.ToClaims();
 
             Guid jwtId = Guid.NewGuid();
@@ -182,7 +195,7 @@ namespace IceCoffee.AspNetCore.Controllers
             {
                 Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme,
                     RegisteredClaimNames.UserName, RegisteredClaimNames.RoleNames),
-                // 比较合理的值为 5~10 分钟，需要一个UTC时间
+                // 比较合理的值为 5~10 分钟, 需要一个UTC时间
                 Expires = accessTokenExpiryDate,
                 SigningCredentials = new SigningCredentials(tokenValidationParams.IssuerSigningKey, SecurityAlgorithms.HmacSha256Signature)
             };
