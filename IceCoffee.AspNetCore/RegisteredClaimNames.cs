@@ -20,7 +20,5 @@ namespace IceCoffee.AspNetCore
         public const string PhoneNumber = "cn_phone_number";
 
         public const string Areas = "cn_areas";
-
-        public const string HttpMethods = "cn_http_methods";
     }
 }

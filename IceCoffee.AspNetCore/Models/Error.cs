@@ -14,6 +14,6 @@ namespace IceCoffee.AspNetCore.Models
 
         [JsonPropertyName("details")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string[]? Details { get; set; }
+        public IEnumerable<string>? Details { get; set; }
     }
 }

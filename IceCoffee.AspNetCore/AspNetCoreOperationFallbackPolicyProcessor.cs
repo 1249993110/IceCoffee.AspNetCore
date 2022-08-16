@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Namotion.Reflection;
 using NSwag;
 using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using NSwag.Generation.Processors.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace IceCoffee.AspNetCore
 {

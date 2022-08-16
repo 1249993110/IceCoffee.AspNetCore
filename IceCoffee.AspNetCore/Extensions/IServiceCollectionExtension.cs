@@ -1,8 +1,10 @@
-﻿using IceCoffee.AspNetCore.Authorization;
+﻿using IceCoffee.AspNetCore.Authentication;
+using IceCoffee.AspNetCore.Authorization;
 using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Options;
 using IceCoffee.AspNetCore.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -79,7 +81,13 @@ namespace IceCoffee.AspNetCore.Extensions
                    默认允许 300s 的时间偏移量, 设置为0即可                  */
                 ClockSkew = TimeSpan.FromSeconds(jwtOptions.ClockSkew),
                 // 指示令牌是否必须具有“到期”值
-                RequireExpirationTime = jwtOptions.RequireExpirationTime
+                RequireExpirationTime = jwtOptions.RequireExpirationTime,
+
+                AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
+
+                NameClaimType = RegisteredClaimNames.UserName,
+
+                RoleClaimType = RegisteredClaimNames.RoleNames
             };
 
             services.AddSingleton(tokenValidationParams);
@@ -89,7 +97,7 @@ namespace IceCoffee.AspNetCore.Extensions
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            }).AddJwtBearer(options => // AuthenticationType 为 Federation 
             {
                 // default is true
                 options.RequireHttpsMetadata = false;
@@ -100,28 +108,12 @@ namespace IceCoffee.AspNetCore.Extensions
         }
 
         /// <summary>
-        /// 添加 Jwt 授权策略到 IServiceCollection
+        /// 添加联合的 Cookie、JWT 与 ApiKey 区域授权策略服务到 IServiceCollection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddJwtAuthorization(this IServiceCollection services)
+        public static IServiceCollection AddAreaAuthorization(this IServiceCollection services)
         {
-            return services.AddJwtAuthorization(new PermissionRequirement());
-        }
-
-        /// <summary>
-        /// 添加 Jwt 授权策略到 IServiceCollection
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="permissionRequirement"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddJwtAuthorization(this IServiceCollection services, PermissionRequirement permissionRequirement)
-        {
-            // 添加授权处理器（默认添加微信和PC）, 这里不能使用 TryAdd, 否则只会添加一个 IAuthorizationHandler
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, AuthorizationHandler>());
-
-            services.AddSingleton(permissionRequirement);
-
             // 添加授权策略服务
             services.AddAuthorization(options =>
             {
@@ -139,14 +131,20 @@ namespace IceCoffee.AspNetCore.Extensions
                 // InvokeHandlersAfterFailure 为 true 的情况下（默认为 true ）, 所有注册了的 AuthorizationHandler 都会被执行
                 options.InvokeHandlersAfterFailure = false;
 
-                // 如果资源具有任何 IAuthorizeData 实例, 则将对它们进行评估, 而不是回退策略
-                options.FallbackPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                    .AddRequirements(permissionRequirement)
+                // 如果资源具有任何 IAuthorizeData 实例, 则将对它们进行评估, 而不是回退策略, authenticationSchemes 认证方案按反序进行
+                options.FallbackPolicy = new AuthorizationPolicyBuilder(
+                    AuthenticationSchemes.ApiKeyAuthenticationSchemeName,
+                    JwtBearerDefaults.AuthenticationScheme,
+                    CookieAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser() // DenyAnonymousAuthorizationRequirement
+                    .AddRequirements(new AreaAuthorizationRequirement())
                     .Build();
             });
 
             return services;
+
+            // 添加授权处理器, 这里不能使用 TryAdd, 因为已经存在 PassThroughAuthorizationHandler
+            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, AreaAuthorizationRequirement>());
         }
 
         /// <summary>

@@ -2,7 +2,6 @@
 using IceCoffee.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -10,7 +9,6 @@ using System.Security.Claims;
 
 namespace IceCoffee.AspNetCore.Controllers
 {
-    
     public class AccountControllerBase : ApiControllerBase
     {
         /// <summary>
@@ -31,16 +29,15 @@ namespace IceCoffee.AspNetCore.Controllers
             await SignInWithCookie(userInfo, properties);
         }
 
-
         /// <summary>
         /// 通过 Cookie 登录, 默认开启滑动过期, 窗口期7天
         /// </summary>
         protected virtual async Task SignInWithCookie(UserInfo userInfo, AuthenticationProperties authenticationProperties)
         {
             var claimsIdentity = new ClaimsIdentity(
-                userInfo.ToClaims(), 
+                userInfo.ToClaims(),
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                RegisteredClaimNames.UserName, 
+                RegisteredClaimNames.UserName,
                 RegisteredClaimNames.RoleNames);
 
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -62,7 +59,6 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <returns></returns>
         protected virtual async Task<JwtToken> SignInWithJwt(UserInfo userInfo)
         {
-            var tokenValidationParams = HttpContext.RequestServices.GetRequiredService<TokenValidationParameters>();
             return await GenerateJwtToken(userInfo);
         }
 
@@ -181,7 +177,7 @@ namespace IceCoffee.AspNetCore.Controllers
             Guid jwtId = Guid.NewGuid();
             claims.AddRange(new[]
             {
-                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Aud, tokenValidationParams.ValidAudience),
+                new Claim(JwtRegisteredClaimNames.Aud, tokenValidationParams.ValidAudience),
                 new Claim(JwtRegisteredClaimNames.Iss, tokenValidationParams.ValidIssuer),
                 new Claim(JwtRegisteredClaimNames.Jti, jwtId.ToString())
             });
@@ -193,8 +189,7 @@ namespace IceCoffee.AspNetCore.Controllers
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme,
-                    RegisteredClaimNames.UserName, RegisteredClaimNames.RoleNames),
+                Subject = new ClaimsIdentity(claims),
                 // 比较合理的值为 5~10 分钟, 需要一个UTC时间
                 Expires = accessTokenExpiryDate,
                 SigningCredentials = new SigningCredentials(tokenValidationParams.IssuerSigningKey, SecurityAlgorithms.HmacSha256Signature)

@@ -25,7 +25,7 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 角色名
         /// </summary>
-        public string[]? RoleNames { get; set; }
+        public IEnumerable<string>? RoleNames { get; set; }
 
         /// <summary>
         /// Email
@@ -40,12 +40,7 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 授权的区域
         /// </summary>
-        public string[]? Areas { get; set; }
-
-        /// <summary>
-        /// 授权的 HttpMethods
-        /// </summary>
-        public string[]? HttpMethods { get; set; }
+        public IEnumerable<string>? Areas { get; set; }
 
         public UserInfo()
         {
@@ -87,10 +82,6 @@ namespace IceCoffee.AspNetCore.Models
 
                     case RegisteredClaimNames.Areas:
                         Areas = claim.Value.Split(',');
-                        break;
-
-                    case RegisteredClaimNames.HttpMethods:
-                        HttpMethods = claim.Value.Split(';');
                         break;
                 }
             }
@@ -137,11 +128,6 @@ namespace IceCoffee.AspNetCore.Models
             if (this.Areas != null)
             {
                 claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', this.Areas)));
-            }
-
-            if (this.HttpMethods != null)
-            {
-                claims.Add(new Claim(RegisteredClaimNames.HttpMethods, string.Join(';', this.HttpMethods)));
             }
 
             return claims;

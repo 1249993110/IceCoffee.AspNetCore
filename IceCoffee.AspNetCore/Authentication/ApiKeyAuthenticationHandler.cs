@@ -1,13 +1,10 @@
-﻿using IceCoffee.Common;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace IceCoffee.AspNetCore.Authentication
 {
@@ -23,7 +20,7 @@ namespace IceCoffee.AspNetCore.Authentication
         static ApiKeyAuthenticationHandler()
         {
             // 声明
-            var claims = new Claim[] { };
+            var claims = Array.Empty<Claim>();
 
             // 身份证
             var claimsIdentity = new ClaimsIdentity(claims, AuthenticationSchemes.ApiKeyAuthenticationSchemeName);
@@ -42,7 +39,6 @@ namespace IceCoffee.AspNetCore.Authentication
             ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
-
         }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -55,10 +51,11 @@ namespace IceCoffee.AspNetCore.Authentication
 
             if (string.IsNullOrEmpty(Options.AccessToken))
             {
-                return Task.FromResult(AuthenticateResult.Success(_authTicket));
+                return Task.FromResult(AuthenticateResult.NoResult());
+                // return Task.FromResult(AuthenticateResult.Fail("The configured access token is null or empty"));
             }
 
-            if(Context.Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken)
+            if (Context.Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken)
             {
                 return Task.FromResult(AuthenticateResult.Success(_authTicket));
             }
@@ -69,7 +66,6 @@ namespace IceCoffee.AspNetCore.Authentication
             }
 
             return Task.FromResult(AuthenticateResult.NoResult());
-            //return Task.FromResult(AuthenticateResult.Fail("Unauthenticated"));
         }
     }
 }
