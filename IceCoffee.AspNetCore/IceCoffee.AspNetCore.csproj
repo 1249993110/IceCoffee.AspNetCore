@@ -16,7 +16,7 @@
 		<Product>IceCoffee</Product>
 		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
 		<TargetFramework>net6.0</TargetFramework>
-		<Version>1.0.3.0</Version>
+		<Version>1.0.3.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

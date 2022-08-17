@@ -10,7 +10,7 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 用户Id
         /// </summary>
-        public Guid? UserId { get; set; }
+        public string? UserId { get; set; }
 
         /// <summary>
         /// 用户名
@@ -57,7 +57,7 @@ namespace IceCoffee.AspNetCore.Models
                 switch (claim.Type)
                 {
                     case RegisteredClaimNames.UserId:
-                        UserId = Guid.Parse(claim.Value);
+                        UserId = claim.Value;
                         break;
 
                     case RegisteredClaimNames.UserName:
@@ -95,9 +95,9 @@ namespace IceCoffee.AspNetCore.Models
         {
             var claims = new List<Claim>();
 
-            if (this.UserId.HasValue)
+            if (this.UserId != null)
             {
-                claims.Add(new Claim(RegisteredClaimNames.UserId, this.UserId.Value.ToString()));
+                claims.Add(new Claim(RegisteredClaimNames.UserId, this.UserId));
             }
 
             if (this.UserName != null)

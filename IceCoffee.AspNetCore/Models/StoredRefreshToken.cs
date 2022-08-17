@@ -24,12 +24,12 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 用户Id
         /// </summary>
-        public Guid UserId { get; set; }
+        public string? UserId { get; set; }
 
         /// <summary>
         /// 使用 JwtId 映射到对应的 token
         /// </summary>
-        public Guid JwtId { get; set; }
+        public string? JwtId { get; set; }
 
         /// <summary>
         /// 是否出于安全原因已将其撤销

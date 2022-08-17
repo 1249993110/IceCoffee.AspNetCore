@@ -136,7 +136,7 @@ namespace IceCoffee.AspNetCore.Controllers
 
                     // Validation 7 - validate the id
                     // 根据数据库中保存的 Id 验证收到的 token 的 Id
-                    if (storedRefreshToken.JwtId.ToString() != validatedToken.Id)
+                    if (storedRefreshToken.JwtId != validatedToken.Id)
                     {
                         throw new Exception("令牌与保存的令牌不匹配");
                     }
@@ -174,7 +174,7 @@ namespace IceCoffee.AspNetCore.Controllers
 
             var claims = userInfo.ToClaims();
 
-            Guid jwtId = Guid.NewGuid();
+            string jwtId = Guid.NewGuid().ToString();
             claims.AddRange(new[]
             {
                 new Claim(JwtRegisteredClaimNames.Aud, tokenValidationParams.ValidAudience),
@@ -208,7 +208,7 @@ namespace IceCoffee.AspNetCore.Controllers
                     Id = refreshToken,
                     JwtId = jwtId,
                     IsRevorked = false,
-                    UserId = userInfo.UserId.GetValueOrDefault(),
+                    UserId = userInfo.UserId,
                     CreatedDate = now,
                     ExpiryDate = refreshTokenExpiryDate
                 };
