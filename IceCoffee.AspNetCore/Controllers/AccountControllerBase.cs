@@ -172,6 +172,8 @@ namespace IceCoffee.AspNetCore.Controllers
         {
             var tokenValidationParams = HttpContext.RequestServices.GetRequiredService<TokenValidationParameters>();
 
+            string jwtId = Guid.NewGuid().ToString();
+
             var claims = userInfo.ToClaims();
 
             string jwtId = Guid.NewGuid().ToString();
