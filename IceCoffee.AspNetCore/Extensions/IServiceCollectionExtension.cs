@@ -21,7 +21,7 @@ namespace IceCoffee.AspNetCore.Extensions
     public static class IServiceCollectionExtension
     {
         /// <summary>
-        /// 添加 UserInfo 为 Scoped 到 IServiceCollection
+        /// 添加 <see cref="UserInfo"/> 为 Scoped 到 IServiceCollection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
@@ -29,6 +29,24 @@ namespace IceCoffee.AspNetCore.Extensions
         {
             services.AddHttpContextAccessor();
             services.TryAddScoped(services => new UserInfo(services.GetRequiredService<IHttpContextAccessor>().HttpContext?.User.Claims ?? Array.Empty<Claim>()));
+            return services;
+        }
+
+        /// <summary>
+        /// 添加 TUserInfo 为 Scoped 到 IServiceCollection
+        /// </summary>
+        /// <typeparam name="TUserInfo"></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddUserInfo<TUserInfo>(this IServiceCollection services) where TUserInfo : UserInfo, new ()
+        {
+            services.AddHttpContextAccessor();
+            services.TryAddScoped(services =>
+            {
+                var claims = services.GetRequiredService<IHttpContextAccessor>().HttpContext?.User.Claims ?? Array.Empty<Claim>();
+                return Activator.CreateInstance(typeof(TUserInfo), args: new object[] { claims }) as TUserInfo ?? new TUserInfo();
+            });
+
             return services;
         }
 

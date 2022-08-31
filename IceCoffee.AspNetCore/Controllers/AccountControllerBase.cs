@@ -73,6 +73,16 @@ namespace IceCoffee.AspNetCore.Controllers
         }
 
         /// <summary>
+        /// 从 Jwt 的声明中还原 UserInfo
+        /// </summary>
+        /// <param name="claims"></param>
+        /// <returns></returns>
+        protected virtual UserInfo GetUserInfoByJwtClaims(IEnumerable<Claim> claims)
+        {
+            return new UserInfo(claims);
+        }
+
+        /// <summary>
         /// 刷新令牌
         /// </summary>
         /// <param name="accessToken">已过期的访问令牌</param>
@@ -141,9 +151,8 @@ namespace IceCoffee.AspNetCore.Controllers
                         throw new Exception("令牌与保存的令牌不匹配");
                     }
 
-                    var userInfo = new UserInfo(jwtSecurityToken.Claims);
                     // 生成一个新的 token
-                    return await GenerateJwtToken(userInfo);
+                    return await GenerateJwtToken(GetUserInfoByJwtClaims(jwtSecurityToken.Claims));
                 }
             }
             catch (CustomExceptionBase)
@@ -176,7 +185,6 @@ namespace IceCoffee.AspNetCore.Controllers
 
             var claims = userInfo.ToClaims();
 
-            string jwtId = Guid.NewGuid().ToString();
             claims.AddRange(new[]
             {
                 new Claim(JwtRegisteredClaimNames.Aud, tokenValidationParams.ValidAudience),
