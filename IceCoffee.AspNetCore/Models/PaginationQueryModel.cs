@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace IceCoffee.AspNetCore.Models
 {
     /// <summary>
     /// 分页查询参数
     /// </summary>
-    public class PaginationQueryModel
+    public class PaginationQueryModel<TOrder> where TOrder: struct, Enum
     {
         /// <summary>
         /// 页码
@@ -27,7 +28,8 @@ namespace IceCoffee.AspNetCore.Models
         /// <summary>
         /// 排序
         /// </summary>
-        public string? Order { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public TOrder? Order { get; set; }
 
         /// <summary>
         /// 是否降序
