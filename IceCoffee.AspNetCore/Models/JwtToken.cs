@@ -1,7 +1,15 @@
-﻿namespace IceCoffee.AspNetCore.Models
+﻿using System.Text.Json.Serialization;
+
+namespace IceCoffee.AspNetCore.Models
 {
     public class JwtToken
     {
+        /// <summary>
+        /// jwtId
+        /// </summary>
+        [JsonIgnore]
+        public string? Id { get; set; }
+
         /// <summary>
         /// 访问令牌
         /// </summary>

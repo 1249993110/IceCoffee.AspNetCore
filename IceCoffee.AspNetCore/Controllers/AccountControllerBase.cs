@@ -26,16 +26,16 @@ namespace IceCoffee.AspNetCore.Controllers
                 ExpiresUtc = utcNow.AddDays(7),
             };
 
-            await SignInWithCookie(userInfo, properties);
+            await SignInWithCookie(userInfo.ToClaims(), properties);
         }
 
         /// <summary>
         /// 通过 Cookie 登录, 默认开启滑动过期, 窗口期7天
         /// </summary>
-        protected virtual async Task SignInWithCookie(UserInfo userInfo, AuthenticationProperties authenticationProperties)
+        protected virtual async Task SignInWithCookie(IEnumerable<Claim> claims, AuthenticationProperties authenticationProperties)
         {
             var claimsIdentity = new ClaimsIdentity(
-                userInfo.ToClaims(),
+                claims,
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 RegisteredClaimNames.UserName,
                 RegisteredClaimNames.RoleNames);
@@ -57,29 +57,27 @@ namespace IceCoffee.AspNetCore.Controllers
         /// 通过 JWT 登录
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task<JwtToken> SignInWithJwt(UserInfo userInfo)
+        protected virtual JwtToken SignInWithJwt(UserInfo userInfo)
         {
-            return await GenerateJwtToken(userInfo);
+            return GenerateJwtToken(userInfo.ToClaims());
+        }
+
+        /// <summary>
+        /// 通过 JWT 登录
+        /// </summary>
+        /// <returns></returns>
+        protected virtual JwtToken SignInWithJwt(IEnumerable<Claim> claims)
+        {
+            return GenerateJwtToken(claims);
         }
 
         /// <summary>
         /// 通过 JWT 注销
         /// </summary>
         /// <returns>jwtId</returns>
-        protected virtual Task<string> SignOutWithJwt()
+        protected virtual string SignOutWithJwt()
         {
-            string jwtId = User.Claims.First(p => p.Type == JwtRegisteredClaimNames.Jti).Value;
-            return Task.FromResult(jwtId);
-        }
-
-        /// <summary>
-        /// 从 Jwt 的声明中还原 UserInfo
-        /// </summary>
-        /// <param name="claims"></param>
-        /// <returns></returns>
-        protected virtual UserInfo GetUserInfoByJwtClaims(IEnumerable<Claim> claims)
-        {
-            return new UserInfo(claims);
+            return User.Claims.First(p => p.Type == JwtRegisteredClaimNames.Jti).Value;
         }
 
         /// <summary>
@@ -91,7 +89,7 @@ namespace IceCoffee.AspNetCore.Controllers
         /// 令牌验证失败将抛出相应异常
         /// </remarks>
         /// <returns></returns>
-        protected virtual async Task<JwtToken> RefreshToken(string accessToken, StoredRefreshToken? storedRefreshToken)
+        protected virtual JwtToken RefreshToken(string accessToken, StoredRefreshToken? storedRefreshToken)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             SecurityToken? validatedToken = null;
@@ -152,7 +150,7 @@ namespace IceCoffee.AspNetCore.Controllers
                     }
 
                     // 生成一个新的 token
-                    return await GenerateJwtToken(GetUserInfoByJwtClaims(jwtSecurityToken.Claims));
+                    return GenerateJwtToken(jwtSecurityToken.Claims);
                 }
             }
             catch (CustomExceptionBase)
@@ -168,28 +166,29 @@ namespace IceCoffee.AspNetCore.Controllers
         /// <summary>
         /// 生成 JwtToken, 覆盖此方法以更改到期时间跨度
         /// </summary>
-        /// <param name="userInfo"></param>
-        /// <param name="storeRefreshToken"></param>
+        /// <param name="claims"></param>
         /// <param name="accessTokenExpiryTimeSpan">默认 10 分钟</param>
         /// <param name="refreshTokenExpiryTimeSpan">默认 30 天</param>
         /// <returns></returns>
-        protected virtual async Task<JwtToken> GenerateJwtToken(
-            UserInfo userInfo,
-            Func<StoredRefreshToken, Task>? storeRefreshToken = null,
+        protected virtual JwtToken GenerateJwtToken(
+            IEnumerable<Claim> claims,
             TimeSpan? accessTokenExpiryTimeSpan = null,
             TimeSpan? refreshTokenExpiryTimeSpan = null)
         {
+            if (claims is not List<Claim> _claims)
+            {
+                _claims = claims.ToList();
+            }
+
             var tokenValidationParams = HttpContext.RequestServices.GetRequiredService<TokenValidationParameters>();
 
             string jwtId = Guid.NewGuid().ToString();
 
-            var claims = userInfo.ToClaims();
-
-            claims.AddRange(new[]
+            _claims.AddRange(new[]
             {
                 new Claim(JwtRegisteredClaimNames.Aud, tokenValidationParams.ValidAudience),
                 new Claim(JwtRegisteredClaimNames.Iss, tokenValidationParams.ValidIssuer),
-                new Claim(JwtRegisteredClaimNames.Jti, jwtId.ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, jwtId)
             });
 
             var now = DateTime.Now;
@@ -199,7 +198,7 @@ namespace IceCoffee.AspNetCore.Controllers
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
-                Subject = new ClaimsIdentity(claims),
+                Subject = new ClaimsIdentity(_claims),
                 // 比较合理的值为 5~10 分钟, 需要一个UTC时间
                 Expires = accessTokenExpiryDate,
                 SigningCredentials = new SigningCredentials(tokenValidationParams.IssuerSigningKey, SecurityAlgorithms.HmacSha256Signature)
@@ -209,25 +208,12 @@ namespace IceCoffee.AspNetCore.Controllers
             var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var accessToken = jwtTokenHandler.WriteToken(token);
 
+            // 生成长度为 64 的随机字符串
             string refreshToken = Guid.NewGuid().ToString("N") + Utils.GetRandomString(24);
-
-            if (storeRefreshToken != null)
-            {
-                var storedRefreshToken = new StoredRefreshToken()
-                {
-                    Id = refreshToken,
-                    JwtId = jwtId,
-                    IsRevorked = false,
-                    UserId = userInfo.UserId,
-                    CreatedDate = now,
-                    ExpiryDate = refreshTokenExpiryDate
-                };
-
-                await storeRefreshToken.Invoke(storedRefreshToken);
-            }
 
             return new JwtToken()
             {
+                Id = jwtId,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 AccessTokenExpiryDate = accessTokenExpiryDate.Add(TimeZoneInfo.Local.BaseUtcOffset),
