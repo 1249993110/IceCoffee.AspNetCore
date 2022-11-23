@@ -3,6 +3,7 @@ using IceCoffee.AspNetCore.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace IceCoffee.AspNetCore.Middlewares
@@ -20,6 +21,22 @@ namespace IceCoffee.AspNetCore.Middlewares
         {
             _next = next;
             _logger = logger;
+        }
+
+        private static void GetInnerMessage(Exception ex, List<string> details)
+        {
+            if (ex.InnerException != null)
+            {
+                details.Add(ex.InnerException.Message);
+                GetInnerMessage(ex.InnerException, details);
+            }
+        }
+
+        private static IEnumerable<string> GetDetails(Exception ex)
+        {
+            var details = new List<string>();
+            GetInnerMessage(ex, details);
+            return details;
         }
 
         /// <summary>
@@ -50,7 +67,7 @@ namespace IceCoffee.AspNetCore.Middlewares
                     {
                         RequestId = requestId,
                         Message = ex.Message,
-                        Details = new string[] { ex.GetType().FullName, ex.Source, ex.StackTrace }
+                        Details = GetDetails(ex)
                     }
                 };
 #pragma warning restore CS8601 // 引用类型赋值可能为 null。
