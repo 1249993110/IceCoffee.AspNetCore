@@ -6,7 +6,7 @@ namespace IceCoffee.AspNetCore.Controllers
 {
     public class ApiControllerBase : ControllerBase
     {
-        protected virtual UserInfo UserInfo => HttpContext.RequestServices.GetService<UserInfo>() ?? new UserInfo(HttpContext.User.Claims);
+        protected virtual UserInfo UserInfo => HttpContext.RequestServices.GetService<UserInfo>() ?? new UserInfo(User.Claims);
 
         #region SucceededResult
 
