@@ -22,5 +22,14 @@ namespace IceCoffee.AspNetCore.Extensions
         {
             return httpContext.Features.Get<IRequestCultureFeature>()?.RequestCulture.Culture.Name;
         }
+
+        /// <summary>
+        /// Gets the absolute current url.
+        /// </summary>
+        public static string GetCurrentUri(this HttpContext httpContext)
+        {
+            var request = httpContext.Request;
+            return request.Scheme + Uri.SchemeDelimiter + request.Host + request.PathBase + request.Path + request.QueryString;
+        }
     }
 }
