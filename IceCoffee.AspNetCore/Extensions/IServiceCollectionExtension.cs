@@ -147,8 +147,8 @@ namespace IceCoffee.AspNetCore.Extensions
 
                 // https://blog.csdn.net/sD7O95O/article/details/105382881
                 // InvokeHandlersAfterFailure 为 true 的情况下（默认为 true ）, 所有注册了的 AuthorizationHandler 都会被执行
-                options.InvokeHandlersAfterFailure = false;
-
+                // options.InvokeHandlersAfterFailure = false;
+            
                 // 如果资源具有任何 IAuthorizeData 实例, 则将对它们进行评估, 而不是回退策略, authenticationSchemes 认证方案按反序进行
                 options.FallbackPolicy = new AuthorizationPolicyBuilder(
                     AuthenticationSchemes.ApiKeyAuthenticationSchemeName,
