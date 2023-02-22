@@ -161,8 +161,10 @@ namespace IceCoffee.AspNetCore.Extensions
 
             return services;
 
-            // 添加授权处理器, 这里不能使用 TryAdd, 因为已经存在 PassThroughAuthorizationHandler
-            //services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, AreaAuthorizationRequirement>());
+            // 不需要将 AreaAuthorizationRequirement 注册为服务
+            // 因为在 PassThroughAuthorizationHandler 中会自动遍历实现了 IAuthorizationHandler 的 IAuthorizationRequirement
+            // services.TryAddEnumerable(ServiceDescriptor.Singleton<IAuthorizationHandler, AreaAuthorizationRequirement>());
+            // services.AddSingleton<IAuthorizationHandler, AreaAuthorizationRequirement>();
         }
 
         /// <summary>
