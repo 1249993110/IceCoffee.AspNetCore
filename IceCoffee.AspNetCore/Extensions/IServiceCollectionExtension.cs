@@ -168,6 +168,25 @@ namespace IceCoffee.AspNetCore.Extensions
         }
 
         /// <summary>
+        /// 添加指定 AuthenticationSchemes 的区域授权策略服务到 IServiceCollection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="authenticationSchemes"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddAreaAuthorization(this IServiceCollection services, params string[] authenticationSchemes)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder(authenticationSchemes)
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new AreaAuthorizationRequirement())
+                    .Build();
+            });
+
+            return services;
+        }
+
+        /// <summary>
         /// 添加默认邮件服务
         /// </summary>
         /// <param name="services"></param>
