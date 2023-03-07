@@ -8,7 +8,10 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<!--取消方法注释警告-->
 		<NoWarn>$(NoWarn);1591</NoWarn>
+		<!--取消字段退出构造方法可空警告-->
+		<NoWarn>$(NoWarn);CS8618</NoWarn>
 		<Nullable>enable</Nullable>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -22,10 +25,10 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-		<PackageReference Include="IceCoffee.Common" Version="1.0.3" />
-		<PackageReference Include="NSwag.AspNetCore" Version="13.18.0" />
+		<PackageReference Include="IceCoffee.Common" Version="1.0.3.1" />
+		<PackageReference Include="NSwag.AspNetCore" Version="13.18.2" />
 		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
 		<!--<PackageReference Include="SkiaSharp" Version="2.88.0" />-->
 		<!--<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.80.3" />-->
 	</ItemGroup>
