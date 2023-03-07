@@ -3,6 +3,8 @@ using IceCoffee.AspNetCore.Authorization;
 using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Options;
 using IceCoffee.AspNetCore.Services;
+using IceCoffee.DbCore;
+using IceCoffee.DbCore.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -212,6 +214,32 @@ namespace IceCoffee.AspNetCore.Extensions
         {
             services.Configure<SmtpOptions>(smtpOptionsSection);
             services.TryAddSingleton<EmailService>();
+        }
+
+        /// <summary>
+        /// 注册数据库仓储服务
+        /// </summary>
+        /// <typeparam name="TDbConnectionInfo"></typeparam>
+        /// <param name="services"></param>
+        /// <param name="rootConfigSection">DbConnectionInfos</param>
+        /// <param name="subSectionName"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDatabaseRepositories<TDbConnectionInfo>(this IServiceCollection services, IConfigurationSection rootConfigSection, string? subSectionName = null)
+            where TDbConnectionInfo : DbConnectionInfo
+        {
+            var defaultDbConnectionInfo = rootConfigSection.GetSection(subSectionName ?? typeof(TDbConnectionInfo).Name).Get<TDbConnectionInfo>();
+            services.TryAddSingleton(defaultDbConnectionInfo);
+
+            foreach (var type in typeof(TDbConnectionInfo).Assembly.GetExportedTypes())
+            {
+                if (type.IsSubclassOf(typeof(RepositoryBase)) && type.IsAbstract == false)
+                {
+                    var interfaceType = type.GetInterfaces().First(p => p.IsGenericType == false);
+                    services.TryAddSingleton(interfaceType, type);
+                }
+            }
+
+            return services;
         }
     }
 }
