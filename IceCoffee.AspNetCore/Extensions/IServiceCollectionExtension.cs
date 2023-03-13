@@ -227,8 +227,15 @@ namespace IceCoffee.AspNetCore.Extensions
         public static IServiceCollection AddDatabaseRepositories<TDbConnectionInfo>(this IServiceCollection services, IConfigurationSection rootConfigSection, string? subSectionName = null)
             where TDbConnectionInfo : DbConnectionInfo
         {
-            var defaultDbConnectionInfo = rootConfigSection.GetSection(subSectionName ?? typeof(TDbConnectionInfo).Name).Get<TDbConnectionInfo>();
-            services.TryAddSingleton(defaultDbConnectionInfo);
+            string sectionName = subSectionName ?? typeof(TDbConnectionInfo).Name;
+            var dbConnectionInfo = rootConfigSection.GetSection(sectionName).Get<TDbConnectionInfo>();
+
+            if(dbConnectionInfo == null)
+            {
+                throw new Exception($"sectionName: {sectionName} not found!");
+            }
+
+            services.TryAddSingleton(dbConnectionInfo);
 
             foreach (var type in typeof(TDbConnectionInfo).Assembly.GetExportedTypes())
             {

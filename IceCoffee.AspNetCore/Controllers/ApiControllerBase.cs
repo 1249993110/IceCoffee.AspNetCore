@@ -89,15 +89,11 @@ namespace IceCoffee.AspNetCore.Controllers
         #endregion FailedResult
 
         #region ForbiddenResult
-        protected virtual Response ForbiddenResult(string? message = nameof(HttpStatus.Forbidden))
+        protected virtual Response ForbiddenResult()
         {
             return new Response()
             {
-                Status = HttpStatus.Forbidden,
-                Error = new Error()
-                {
-                    Message = message
-                }
+                Status = HttpStatus.Forbidden
             };
         }
         #endregion ForbiddenResult
