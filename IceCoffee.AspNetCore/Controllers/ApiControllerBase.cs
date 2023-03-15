@@ -1,4 +1,6 @@
 ﻿using IceCoffee.AspNetCore.Models;
+using IceCoffee.DbCore.Dtos;
+using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -48,16 +50,27 @@ namespace IceCoffee.AspNetCore.Controllers
             };
         }
 
-        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(PaginationQueryResult<TItems> paginationQueryResult)
+        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(PaginationQueryResult<TItems> model)
         {
             return new Response<PaginationQueryResult<TItems>>()
             {
                 Status = HttpStatus.OK,
-                Data = paginationQueryResult
+                Data = model
             };
         }
 
-
+        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(PaginationResultDto dto)
+        {
+            return new Response<PaginationQueryResult<TItems>>()
+            {
+                Status = HttpStatus.OK,
+                Data = new PaginationQueryResult<TItems>()
+                {
+                    Items = dto.Items.Adapt<IEnumerable<TItems>>(), 
+                    Total = dto.Total
+                }
+            };
+        }
         #endregion SucceededResult
 
         #region FailedResult
