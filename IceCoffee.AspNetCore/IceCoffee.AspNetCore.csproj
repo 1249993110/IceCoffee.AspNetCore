@@ -20,15 +20,13 @@
 		<Product>IceCoffee</Product>
 		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
 		<TargetFramework>net6.0</TargetFramework>
-		<Version>1.0.3.16</Version>
+		<Version>1.0.3.17</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="IceCoffee.Common" Version="1.0.3.1" />
 		<PackageReference Include="IceCoffee.DbCore" Version="1.0.6.6" />
-		<PackageReference Include="Mapster" Version="7.3.0" />
-		<PackageReference Include="FastExpressionCompiler" Version="3.3.4" />
 		<PackageReference Include="NSwag.AspNetCore" Version="13.18.2" />
 		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />

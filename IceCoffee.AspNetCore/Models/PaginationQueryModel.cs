@@ -39,7 +39,7 @@ namespace IceCoffee.AspNetCore.Models
     /// <summary>
     /// 分页查询参数
     /// </summary>
-    public class PaginationQueryModel<TOrder> where TOrder: struct, Enum
+    public class PaginationQueryModel<TOrder> where TOrder: Enum
     {
         /// <summary>
         /// 页码
@@ -62,7 +62,7 @@ namespace IceCoffee.AspNetCore.Models
         /// 排序
         /// </summary>
         [JsonConverter(typeof(JsonStringEnumConverter))]
-        public TOrder? Order { get; set; }
+        public TOrder Order { get; set; }
 
         /// <summary>
         /// 是否降序
