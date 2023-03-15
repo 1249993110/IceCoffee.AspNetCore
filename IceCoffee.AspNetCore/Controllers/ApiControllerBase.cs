@@ -37,12 +37,12 @@ namespace IceCoffee.AspNetCore.Controllers
             };
         }
 
-        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(IEnumerable<TItems> items, int total)
+        protected virtual Response<PaginationQueryResult<TItems>> PaginationQueryResult<TItems>(int total, IEnumerable<TItems> items)
         {
             return new Response<PaginationQueryResult<TItems>>()
             {
                 Status = HttpStatus.OK,
-                Data = new PaginationQueryResult<TItems>() 
+                Data = new PaginationQueryResult<TItems>()
                 { 
                     Items = items, 
                     Total = total 
