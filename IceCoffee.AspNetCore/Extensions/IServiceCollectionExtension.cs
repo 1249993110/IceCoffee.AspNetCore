@@ -195,6 +195,31 @@ namespace IceCoffee.AspNetCore.Extensions
         }
 
         /// <summary>
+        /// 添加 ApiKey 授权策略服务到 IServiceCollection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="enabledFallback"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddApiKeyAuthorization(this IServiceCollection services, bool enabledFallback = true)
+        {
+            // 添加授权策略服务
+            services.AddAuthorization(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder(AuthenticationSchemes.ApiKeyAuthenticationSchemeName)
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.DefaultPolicy = policy;
+
+                if (enabledFallback)
+                {
+                    options.FallbackPolicy = policy;
+                }
+            });
+
+            return services;
+        }
+
+        /// <summary>
         /// 添加默认邮件服务
         /// </summary>
         /// <param name="services"></param>
