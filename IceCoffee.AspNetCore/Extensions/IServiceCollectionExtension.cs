@@ -260,9 +260,18 @@ namespace IceCoffee.AspNetCore.Extensions
                 throw new Exception($"sectionName: {sectionName} not found!");
             }
 
+            return services.AddDatabaseRepositories(dbConnectionInfo);
+        }
+        /// <summary>
+        /// 注册数据库仓储服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddDatabaseRepositories(this IServiceCollection services, DbConnectionInfo dbConnectionInfo)
+        {
             services.TryAddSingleton(dbConnectionInfo);
 
-            foreach (var type in typeof(TDbConnectionInfo).Assembly.GetExportedTypes())
+            foreach (var type in dbConnectionInfo.GetType().Assembly.GetExportedTypes())
             {
                 if (type.IsSubclassOf(typeof(RepositoryBase)) && type.IsAbstract == false)
                 {
