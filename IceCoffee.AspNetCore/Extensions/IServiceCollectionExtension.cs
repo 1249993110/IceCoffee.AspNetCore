@@ -262,16 +262,19 @@ namespace IceCoffee.AspNetCore.Extensions
 
             return services.AddDatabaseRepositories(dbConnectionInfo);
         }
+
         /// <summary>
         /// 注册数据库仓储服务
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="dbConnectionInfo"></param>
         /// <returns></returns>
-        public static IServiceCollection AddDatabaseRepositories(this IServiceCollection services, DbConnectionInfo dbConnectionInfo)
+        public static IServiceCollection AddDatabaseRepositories<TDbConnectionInfo>(this IServiceCollection services, TDbConnectionInfo dbConnectionInfo)
+            where TDbConnectionInfo : DbConnectionInfo
         {
             services.TryAddSingleton(dbConnectionInfo);
 
-            foreach (var type in dbConnectionInfo.GetType().Assembly.GetExportedTypes())
+            foreach (var type in typeof(TDbConnectionInfo).Assembly.GetExportedTypes())
             {
                 if (type.IsSubclassOf(typeof(RepositoryBase)) && type.IsAbstract == false)
                 {
