@@ -57,9 +57,8 @@ namespace IceCoffee.AspNetCore.Middlewares
                 response.ContentType = "application/json";
                 response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                string requestId = context.GetRequestId();
+                string requestId = context.TraceIdentifier;
 
-#pragma warning disable CS8601 // 引用类型赋值可能为 null。
                 var result = new Response()
                 {
                     Status = HttpStatus.InternalServerError,
@@ -70,7 +69,6 @@ namespace IceCoffee.AspNetCore.Middlewares
                         Details = GetDetails(ex)
                     }
                 };
-#pragma warning restore CS8601 // 引用类型赋值可能为 null。
 
                 await JsonSerializer.SerializeAsync(response.Body, result);
 
