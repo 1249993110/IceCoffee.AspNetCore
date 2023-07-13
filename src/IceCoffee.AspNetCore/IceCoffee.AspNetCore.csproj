@@ -24,12 +24,11 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-		<PackageReference Include="IceCoffee.Common" Version="1.0.4" />
-		<PackageReference Include="IceCoffee.DbCore" Version="1.0.6.10" />
 		<PackageReference Include="NSwag.AspNetCore" Version="13.19.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
-		<PackageReference Include="Mapster" Version="7.3.0" />
-		<PackageReference Include="FastExpressionCompiler" Version="3.3.4" />
+		<!--<PackageReference Include="IceCoffee.Common" Version="1.0.4" />-->
+		<!--<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />-->
+		<!--<PackageReference Include="Mapster" Version="7.3.0" />-->
+		<!--<PackageReference Include="FastExpressionCompiler" Version="3.3.4" />-->
 	</ItemGroup>
 
 	<ItemGroup>
