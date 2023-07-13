@@ -89,9 +89,10 @@ namespace IceCoffee.AspNetCore.Extensions
         /// 靠后的 Scheme 将覆盖前面的 Identity
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="enabledFallback"></param>
         /// <param name="authenticationSchemes"></param>
         /// <returns></returns>
-        public static IServiceCollection AddAreaAuthorization(this IServiceCollection services, params string[] authenticationSchemes)
+        public static IServiceCollection AddAreaAuthorization(this IServiceCollection services, bool enabledFallback, params string[] authenticationSchemes)
         {
             services.AddAuthorization(options =>
             {
@@ -101,28 +102,6 @@ namespace IceCoffee.AspNetCore.Extensions
                     .Build();
 
                 options.DefaultPolicy = policy;
-                options.FallbackPolicy = policy;
-            });
-
-            return services;
-        }
-
-        /// <summary>
-        /// 添加 ApiKey 授权策略服务到 IServiceCollection
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="enabledFallback"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddApiKeyAuthorization(this IServiceCollection services, bool enabledFallback = true)
-        {
-            // 添加授权策略服务
-            services.AddAuthorization(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder(AuthenticationSchemes.ApiKeyAuthenticationSchemeName)
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.DefaultPolicy = policy;
-
                 if (enabledFallback)
                 {
                     options.FallbackPolicy = policy;
