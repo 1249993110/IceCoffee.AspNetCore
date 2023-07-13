@@ -1,13 +1,12 @@
-﻿using System.Text.Json.Serialization;
-
-namespace IceCoffee.AspNetCore.Models
+﻿namespace IceCoffee.AspNetCore.Models
 {
-    public class InternalServerError : Error
+    public class InternalServerError
     {
         /// <summary>
         /// 请求Id
         /// </summary>
-        [JsonPropertyName("requestId")]
-        public string? RequestId { get; set; }
+        public string? TraceId { get; set; }
+
+        public string? Message { get; set; }
     }
 }

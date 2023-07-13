@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using NSwag;
 using NSwag.Generation.AspNetCore;
 using NSwag.Generation.Processors;
@@ -15,11 +14,6 @@ namespace IceCoffee.AspNetCore
     public class AspNetCoreOperationFallbackPolicyProcessor : IOperationProcessor
     {
         private readonly string _name;
-
-        /// <summary>Initializes a new instance of the <see cref="OperationSecurityScopeProcessor"/> class with 'Bearer' name.</summary>
-        public AspNetCoreOperationFallbackPolicyProcessor() : this(JwtBearerDefaults.AuthenticationScheme)
-        {
-        }
 
         /// <summary>Initializes a new instance of the <see cref="OperationSecurityScopeProcessor"/> class.</summary>
         /// <param name="name">The security definition name.</param>

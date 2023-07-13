@@ -1,14 +1,10 @@
-﻿using IceCoffee.AspNetCore.Models;
-using IceCoffee.AspNetCore.Options;
+﻿using IceCoffee.AspNetCore.Options;
 using IceCoffee.Common.Templates;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace IceCoffee.AspNetCore.Services
 {
@@ -39,7 +35,6 @@ namespace IceCoffee.AspNetCore.Services
                 {
                     throw new ArgumentNullException(nameof(EmailSendOptions.FromAddress));
                 }
-
 
                 if (string.IsNullOrEmpty(emailSendParam.ToAddress))
                 {
@@ -79,7 +74,6 @@ namespace IceCoffee.AspNetCore.Services
                     Body = body,
                     // 邮件优先级
                     Priority = MailPriority.Normal
-
                 };
                 // 收件人（可以多个）
                 email.To.Add(emailSendParam.ToAddress);
@@ -101,7 +95,6 @@ namespace IceCoffee.AspNetCore.Services
                 }
                 else
                 {
-                   
                     if (result.Error != null)
                     {
                         throw new Exception("发送邮件异常：", result.Error);
@@ -113,6 +106,5 @@ namespace IceCoffee.AspNetCore.Services
                 throw new Exception("发送邮件异常：", ex);
             }
         }
-
     }
 }

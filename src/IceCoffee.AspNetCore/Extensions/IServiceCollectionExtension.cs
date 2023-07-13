@@ -3,20 +3,12 @@ using IceCoffee.AspNetCore.Authorization;
 using IceCoffee.AspNetCore.Models;
 using IceCoffee.AspNetCore.Options;
 using IceCoffee.AspNetCore.Services;
-using IceCoffee.DbCore;
-using IceCoffee.DbCore.Repositories;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using System.Text;
 
 namespace IceCoffee.AspNetCore.Extensions
 {
@@ -39,96 +31,18 @@ namespace IceCoffee.AspNetCore.Extensions
         /// </summary>
         /// <typeparam name="TUserInfo"></typeparam>
         /// <param name="services"></param>
+        /// <param name="implementationFactory"></param>
         /// <returns></returns>
-        public static IServiceCollection AddUserInfo<TUserInfo>(this IServiceCollection services) where TUserInfo : UserInfo, new ()
+        public static IServiceCollection AddUserInfo<TUserInfo>(this IServiceCollection services, Func<IServiceProvider, TUserInfo> implementationFactory) where TUserInfo : UserInfo
         {
             services.AddHttpContextAccessor();
-            services.TryAddScoped(services =>
-            {
-                var claims = services.GetRequiredService<IHttpContextAccessor>().HttpContext?.User.Claims ?? Array.Empty<Claim>();
-                return Activator.CreateInstance(typeof(TUserInfo), args: new object[] { claims }) as TUserInfo ?? new TUserInfo();
-            });
+            services.TryAddScoped(implementationFactory);
 
             return services;
         }
 
         /// <summary>
-        /// 添加 Jwt 认证策略到 IServiceCollection
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jwtOptionsSection"></param>
-        /// <returns></returns>
-        public static AuthenticationBuilder AddJwtAuthentication(this IServiceCollection services, IConfigurationSection jwtOptionsSection)
-        {
-            services.Configure<JwtOptions>(jwtOptionsSection);
-            var jwtOptions = jwtOptionsSection.Get<JwtOptions>();
-
-            return AddJwtAuthentication(services, jwtOptions);
-        }
-
-        /// <summary>
-        /// 添加 Jwt 认证策略到 IServiceCollection
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="jwtOptions"></param>
-        /// <returns></returns>
-        public static AuthenticationBuilder AddJwtAuthentication(IServiceCollection services, JwtOptions jwtOptions)
-        {
-            if (jwtOptions.SecretKey == null)
-            {
-                throw new Exception("The SecretKey can not be null");
-            }
-
-            var key = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
-
-            var tokenValidationParams = new TokenValidationParameters()
-            {
-                // 是否校验安全令牌
-                ValidateIssuerSigningKey = jwtOptions.ValidateIssuerSigningKey,
-                // 是否校验过期时间
-                ValidateLifetime = jwtOptions.ValidateLifetime,
-                // 是否校验颁发者
-                ValidateIssuer = jwtOptions.ValidateIssuer,
-                // 是否校验被颁发者
-                ValidateAudience = jwtOptions.ValidateAudience,
-                // 安全令牌
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                // 颁发者
-                ValidIssuer = jwtOptions.ValidIssuer,
-                // 被颁发者
-                ValidAudience = jwtOptions.ValidAudience,
-                /* 缓冲过期时间, 总的有效时间等于这个时间加上jwt的过期时间
-                   默认允许 300s 的时间偏移量, 设置为0即可                  */
-                ClockSkew = TimeSpan.FromSeconds(jwtOptions.ClockSkew),
-                // 指示令牌是否必须具有“到期”值
-                RequireExpirationTime = jwtOptions.RequireExpirationTime,
-
-                AuthenticationType = JwtBearerDefaults.AuthenticationScheme,
-
-                NameClaimType = RegisteredClaimNames.UserName,
-
-                RoleClaimType = RegisteredClaimNames.RoleNames
-            };
-
-            services.AddSingleton(tokenValidationParams);
-
-            return services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options => // AuthenticationType 为 Federation 
-            {
-                // default is true
-                options.RequireHttpsMetadata = false;
-                // default is true, 将 jwtToken 保存到当前的 HttpContext, 以通过 await HttpContext.GetTokenAsync("Bearer","access_token"); 获取它
-                options.SaveToken = false;
-                options.TokenValidationParameters = tokenValidationParams;
-            });
-        }
-
-        /// <summary>
-        /// 添加联合的 Cookie、JWT 与 ApiKey 区域授权策略服务到 IServiceCollection
+        /// 添加联合的 Cookie 与 ApiKey 区域授权策略服务到 IServiceCollection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
@@ -142,7 +56,7 @@ namespace IceCoffee.AspNetCore.Extensions
                 // 只是设置被 Authorize 特性标记的 Controller 或 Action 的默认认证计划
                 // options.DefaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 
-                //// 使用 （IAuthorizationRequirement 和 AuthorizationHandler）或 policy.AddAuthenticationSchemes 验证, 
+                //// 使用 （IAuthorizationRequirement 和 AuthorizationHandler）或 policy.AddAuthenticationSchemes 验证,
                 //// 此方法仅可实现让被自定义特性标记的 Controller 或 Action 能绕过 FallbackPolicy, 对其进行直接授权, 而无法默认覆盖所有控制器
 
                 #endregion 备忘
@@ -153,7 +67,6 @@ namespace IceCoffee.AspNetCore.Extensions
 
                 var policy = new AuthorizationPolicyBuilder(
                     AuthenticationSchemes.ApiKeyAuthenticationSchemeName,
-                    JwtBearerDefaults.AuthenticationScheme,
                     CookieAuthenticationDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser() // DenyAnonymousAuthorizationRequirement
                     .AddRequirements(new AreaAuthorizationRequirement())
@@ -220,70 +133,25 @@ namespace IceCoffee.AspNetCore.Extensions
         }
 
         /// <summary>
-        /// 添加默认邮件服务
+        /// 添加邮件服务
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="configureSmtpOptions"></param>
-        public static void AddEmailService(this IServiceCollection services, Action<SmtpOptions> configureSmtpOptions)
+        /// <param name="configure"></param>
+        public static void AddEmailService(this IServiceCollection services, Action<SmtpOptions> configure)
         {
-            services.Configure(configureSmtpOptions);
+            services.AddOptions<SmtpOptions>().Configure(configure);
             services.TryAddSingleton<EmailService>();
         }
 
         /// <summary>
-        /// 添加默认邮件服务
+        /// 添加邮件服务
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="smtpOptionsSection"></param>
-        public static void AddEmailService(this IServiceCollection services, IConfigurationSection smtpOptionsSection)
+        /// <param name="configurationSectionPath"></param>
+        public static void AddEmailService(this IServiceCollection services, string configurationSectionPath)
         {
-            services.Configure<SmtpOptions>(smtpOptionsSection);
+            services.AddOptions<SmtpOptions>().BindConfiguration(configurationSectionPath);
             services.TryAddSingleton<EmailService>();
-        }
-
-        /// <summary>
-        /// 注册数据库仓储服务
-        /// </summary>
-        /// <typeparam name="TDbConnectionInfo"></typeparam>
-        /// <param name="services"></param>
-        /// <param name="rootConfigSection">DbConnectionInfos</param>
-        /// <param name="subSectionName"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddDatabaseRepositories<TDbConnectionInfo>(this IServiceCollection services, IConfigurationSection rootConfigSection, string? subSectionName = null)
-            where TDbConnectionInfo : DbConnectionInfo
-        {
-            string sectionName = subSectionName ?? typeof(TDbConnectionInfo).Name;
-            var dbConnectionInfo = rootConfigSection.GetSection(sectionName).Get<TDbConnectionInfo>();
-
-            if(dbConnectionInfo == null)
-            {
-                throw new Exception($"sectionName: {sectionName} not found!");
-            }
-
-            return services.AddDatabaseRepositories(dbConnectionInfo);
-        }
-
-        /// <summary>
-        /// 注册数据库仓储服务
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="dbConnectionInfo"></param>
-        /// <returns></returns>
-        public static IServiceCollection AddDatabaseRepositories<TDbConnectionInfo>(this IServiceCollection services, TDbConnectionInfo dbConnectionInfo)
-            where TDbConnectionInfo : DbConnectionInfo
-        {
-            services.TryAddSingleton(dbConnectionInfo);
-
-            foreach (var type in typeof(TDbConnectionInfo).Assembly.GetExportedTypes())
-            {
-                if (type.IsSubclassOf(typeof(RepositoryBase)) && type.IsAbstract == false)
-                {
-                    var interfaceType = type.GetInterfaces().First(p => p.IsGenericType == false);
-                    services.TryAddSingleton(interfaceType, type);
-                }
-            }
-
-            return services;
         }
     }
 }

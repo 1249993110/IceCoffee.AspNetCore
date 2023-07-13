@@ -1,9 +1,10 @@
-﻿using IceCoffee.AspNetCore.Extensions;
-using IceCoffee.AspNetCore.Models;
+﻿using IceCoffee.AspNetCore.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace IceCoffee.AspNetCore.Middlewares
@@ -23,29 +24,15 @@ namespace IceCoffee.AspNetCore.Middlewares
             _logger = logger;
         }
 
-        private static void GetInnerMessage(Exception ex, List<string> details)
-        {
-            if (ex.InnerException != null)
-            {
-                details.Add(ex.InnerException.Message);
-                GetInnerMessage(ex.InnerException, details);
-            }
-        }
-
-        private static IEnumerable<string> GetDetails(Exception ex)
-        {
-            var details = new List<string>();
-            GetInnerMessage(ex, details);
-            return details;
-        }
-
         /// <summary>
         /// AspNetCore 的管道执行至 ExceptionHandlerMiddleware 时, 捕获其他中间件异常
         /// </summary>
         /// <param name="context"></param>
+        /// <param name="options"></param>
+        /// <param name="env"></param>
         /// <returns></returns>
         [DebuggerStepThrough]
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, IOptions<Microsoft.AspNetCore.Mvc.JsonOptions> options, IWebHostEnvironment env)
         {
             try
             {
@@ -58,25 +45,21 @@ namespace IceCoffee.AspNetCore.Middlewares
                 response.StatusCode = StatusCodes.Status500InternalServerError;
 
                 string requestId = context.TraceIdentifier;
-
-                var result = new Response()
+                var model = new InternalServerError()
                 {
-                    Status = HttpStatus.InternalServerError,
-                    Error = new InternalServerError() 
-                    {
-                        RequestId = requestId,
-                        Message = ex.Message,
-                        Details = GetDetails(ex)
-                    }
+                    TraceId = requestId,
+                    Message = env.IsDevelopment() ? ex.Message : "Internal server error",
                 };
 
-                await JsonSerializer.SerializeAsync(response.Body, result);
+                await JsonSerializer.SerializeAsync(response.Body, model, options.Value.JsonSerializerOptions);
 
                 var path = context.Request.Path;
 
-                _logger.LogError(ex, 
-                    "The exception is caught in the global exception handling middleware, requestId: {requestId}, path: {path}"
-                    , requestId, path);
+                _logger.LogError(
+                    ex,
+                    "The exception is caught in the global exception handling middleware, requestId: {requestId}, path: {path}", 
+                    requestId,
+                    path);
             }
         }
     }

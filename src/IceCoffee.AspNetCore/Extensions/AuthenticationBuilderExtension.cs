@@ -1,8 +1,5 @@
 ﻿using IceCoffee.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace IceCoffee.AspNetCore.Extensions
 {
@@ -12,13 +9,13 @@ namespace IceCoffee.AspNetCore.Extensions
         /// 添加 ApiKey 认证
         /// </summary>
         /// <param name="authenticationBuilder"></param>
-        /// <param name="apiKeyOptions"></param>
+        /// <param name="configureOptions"></param>
         /// <returns></returns>
         public static AuthenticationBuilder AddApiKeyAuthentication(this AuthenticationBuilder authenticationBuilder,
-            Action<ApiKeyAuthenticationSchemeOptions> apiKeyOptions)
+            Action<ApiKeyAuthenticationSchemeOptions> configureOptions)
         {
             return authenticationBuilder.AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                AuthenticationSchemes.ApiKeyAuthenticationSchemeName, apiKeyOptions);
+                AuthenticationSchemes.ApiKeyAuthenticationSchemeName, configureOptions);
         }
     }
 }
