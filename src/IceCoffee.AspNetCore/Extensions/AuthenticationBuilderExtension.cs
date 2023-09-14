@@ -15,7 +15,20 @@ namespace IceCoffee.AspNetCore.Extensions
             Action<ApiKeyAuthenticationSchemeOptions> configureOptions)
         {
             return authenticationBuilder.AddScheme<ApiKeyAuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                AuthenticationSchemes.ApiKeyAuthenticationSchemeName, configureOptions);
+                AuthenticationSchemes.ApiKeyAuthenticationScheme, configureOptions);
+        }
+
+        /// <summary>
+        /// 添加 Basic 认证
+        /// </summary>
+        /// <param name="authenticationBuilder"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
+        public static AuthenticationBuilder AddBasicAuthentication(this AuthenticationBuilder authenticationBuilder,
+            Action<BasicAuthenticationSchemeOptions> configureOptions)
+        {
+            return authenticationBuilder.AddScheme<BasicAuthenticationSchemeOptions, BasicAuthenticationHandler>(
+                AuthenticationSchemes.BasicAuthenticationScheme, configureOptions);
         }
     }
 }

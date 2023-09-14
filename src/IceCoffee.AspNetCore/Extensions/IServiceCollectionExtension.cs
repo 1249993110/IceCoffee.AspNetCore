@@ -65,8 +65,9 @@ namespace IceCoffee.AspNetCore.Extensions
                 // InvokeHandlersAfterFailure 为 true 的情况下（默认为 true ）, 所有注册了的 AuthorizationHandler 都会被执行
                 // options.InvokeHandlersAfterFailure = false;
 
+                // 靠后的 Scheme 将覆盖前面的 Identity
                 var policy = new AuthorizationPolicyBuilder(
-                    AuthenticationSchemes.ApiKeyAuthenticationSchemeName,
+                    AuthenticationSchemes.ApiKeyAuthenticationScheme,
                     CookieAuthenticationDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser() // DenyAnonymousAuthorizationRequirement
                     .AddRequirements(new AreaAuthorizationRequirement())
@@ -85,20 +86,41 @@ namespace IceCoffee.AspNetCore.Extensions
         }
 
         /// <summary>
-        /// 添加指定 AuthenticationSchemes 的区域授权策略服务到 IServiceCollection
-        /// 靠后的 Scheme 将覆盖前面的 Identity
+        /// 添加指 ApiKey 认证授权策略服务到 IServiceCollection
         /// </summary>
         /// <param name="services"></param>
         /// <param name="enabledFallback"></param>
-        /// <param name="authenticationSchemes"></param>
         /// <returns></returns>
-        public static IServiceCollection AddAreaAuthorization(this IServiceCollection services, bool enabledFallback, params string[] authenticationSchemes)
+        public static IServiceCollection AddApiKeyAuthorization(this IServiceCollection services, bool enabledFallback = true)
         {
             services.AddAuthorization(options =>
             {
-                var policy = new AuthorizationPolicyBuilder(authenticationSchemes)
+                var policy = new AuthorizationPolicyBuilder(AuthenticationSchemes.ApiKeyAuthenticationScheme)
                     .RequireAuthenticatedUser()
-                    .AddRequirements(new AreaAuthorizationRequirement())
+                    .Build();
+
+                options.DefaultPolicy = policy;
+                if (enabledFallback)
+                {
+                    options.FallbackPolicy = policy;
+                }
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// 添加指 Basic 认证授权策略服务到 IServiceCollection
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="enabledFallback"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddBasicAuthorization(this IServiceCollection services, bool enabledFallback = true)
+        {
+            services.AddAuthorization(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder(AuthenticationSchemes.BasicAuthenticationScheme)
+                    .RequireAuthenticatedUser()
                     .Build();
 
                 options.DefaultPolicy = policy;

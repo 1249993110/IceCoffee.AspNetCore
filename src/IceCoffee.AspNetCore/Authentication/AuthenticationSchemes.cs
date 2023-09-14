@@ -6,6 +6,8 @@ namespace IceCoffee.AspNetCore.Authentication
 {
     public struct AuthenticationSchemes
     {
-        public const string ApiKeyAuthenticationSchemeName = "ApiKeyAuthentication";
+        public const string ApiKeyAuthenticationScheme = "ApiKey";
+
+        public const string BasicAuthenticationScheme = "Basic";
     }
 }

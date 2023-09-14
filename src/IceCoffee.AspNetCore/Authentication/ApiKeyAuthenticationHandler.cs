@@ -23,13 +23,13 @@ namespace IceCoffee.AspNetCore.Authentication
             var claims = Array.Empty<Claim>();
 
             // 身份证
-            var claimsIdentity = new ClaimsIdentity(claims, AuthenticationSchemes.ApiKeyAuthenticationSchemeName);
+            var claimsIdentity = new ClaimsIdentity(claims, AuthenticationSchemes.ApiKeyAuthenticationScheme);
 
             // 表示一个人, 把身份证给这个人
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
 
             // 将凭证与人关联
-            _authTicket = new AuthenticationTicket(claimsPrincipal, AuthenticationSchemes.ApiKeyAuthenticationSchemeName);
+            _authTicket = new AuthenticationTicket(claimsPrincipal, AuthenticationSchemes.ApiKeyAuthenticationScheme);
         }
 
         public ApiKeyAuthenticationHandler(
@@ -55,12 +55,12 @@ namespace IceCoffee.AspNetCore.Authentication
                 // return Task.FromResult(AuthenticateResult.Fail("The configured access token is null or empty"));
             }
 
-            if (Context.Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken)
+            if (Request.Headers.TryGetValue(HttpRequestHeaderName, out var value) && value == Options.AccessToken)
             {
                 return Task.FromResult(AuthenticateResult.Success(_authTicket));
             }
 
-            if (Context.Request.Query[HttpRequestHeaderName] == Options.AccessToken)
+            if (Request.Query[HttpRequestHeaderName] == Options.AccessToken)
             {
                 return Task.FromResult(AuthenticateResult.Success(_authTicket));
             }

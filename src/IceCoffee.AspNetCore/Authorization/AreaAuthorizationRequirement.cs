@@ -24,7 +24,7 @@ namespace IceCoffee.AspNetCore.Authorization
                 return Task.CompletedTask;
             }
 
-            if (context.User.Identities.Any(i => i.AuthenticationType == AuthenticationSchemes.ApiKeyAuthenticationSchemeName))
+            if (context.User.Identities.Any(i => i.AuthenticationType == AuthenticationSchemes.ApiKeyAuthenticationScheme))
             {
                 context.Succeed(this);
                 return Task.CompletedTask;
