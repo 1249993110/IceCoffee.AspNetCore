@@ -10,6 +10,7 @@
 		<Description>A simple AspNetCore library</Description>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<LangVersion>10.0</LangVersion>
 		<!--取消方法注释警告-->
 		<NoWarn>$(NoWarn);1591</NoWarn>
 		<!--取消字段退出构造方法可空警告-->
@@ -19,7 +20,7 @@
 		<PackageProjectUrl>https://github.com/1249993110/IceCoffee.AspNetCore</PackageProjectUrl>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
-		<Version>1.1.2</Version>
+		<Version>1.1.3</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -35,13 +35,13 @@ namespace IceCoffee.AspNetCore.Authentication
 
             if (AuthenticationHeaderValue.TryParse(Request.Headers[HeaderNames.Authorization], out var headerValue) == false)
             {
-                Logger.LogInformation("No valid 'Authorization' header found in the request.");
+                Logger.LogDebug("No valid 'Authorization' header found in the request.");
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
             if (headerValue.Scheme.Equals(AuthenticationSchemes.BasicAuthenticationScheme, StringComparison.OrdinalIgnoreCase) == false)
             {
-                Logger.LogInformation($"'Authorization' header found but the scheme is not a '{AuthenticationSchemes.BasicAuthenticationScheme}' scheme.");
+                Logger.LogDebug($"'Authorization' header found but the scheme is not a '{AuthenticationSchemes.BasicAuthenticationScheme}' scheme.");
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
@@ -56,7 +56,7 @@ namespace IceCoffee.AspNetCore.Authentication
                 return Task.FromResult(AuthenticateResult.Fail("Error decoding credentials from header value." + Environment.NewLine + exception.Message));
             }
 
-            if (IsAuthorized(credentials) == false)
+            if (CheckPassword(credentials) == false)
             {
                 return Task.FromResult(AuthenticateResult.Fail("Invalid userName or password."));
             }
@@ -128,7 +128,7 @@ namespace IceCoffee.AspNetCore.Authentication
             public string Password { get; }
         }
 
-        private bool IsAuthorized(BasicCredentials credentials)
+        private bool CheckPassword(BasicCredentials credentials)
         {
             return credentials.UserName.Equals(Options.UserName, StringComparison.InvariantCultureIgnoreCase) && credentials.Password == Options.Password;
         }
