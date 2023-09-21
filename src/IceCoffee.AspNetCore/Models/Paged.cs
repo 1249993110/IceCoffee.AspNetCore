@@ -1,6 +1,6 @@
 ﻿namespace IceCoffee.AspNetCore.Models
 {
-    public class Pagination<T>
+    public class Paged<T>
     {
         /// <summary>
         /// 总计
