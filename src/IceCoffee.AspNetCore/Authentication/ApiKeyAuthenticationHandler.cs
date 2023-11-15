@@ -32,6 +32,15 @@ namespace IceCoffee.AspNetCore.Authentication
             _authTicket = new AuthenticationTicket(claimsPrincipal, AuthenticationSchemes.ApiKeyAuthenticationScheme);
         }
 
+#if NET8_0_OR_GREATER
+        public ApiKeyAuthenticationHandler(
+            IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> options,
+            ILoggerFactory logger,
+            UrlEncoder encoder)
+            : base(options, logger, encoder)
+        {
+        }
+#else
         public ApiKeyAuthenticationHandler(
             IOptionsMonitor<ApiKeyAuthenticationSchemeOptions> options,
             ILoggerFactory logger,
@@ -40,6 +49,7 @@ namespace IceCoffee.AspNetCore.Authentication
             : base(options, logger, encoder, clock)
         {
         }
+#endif
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
