@@ -38,10 +38,18 @@ namespace IceCoffee.AspNetCore.Models
         public string? PhoneNumber { get; set; }
 
         /// <summary>
-        /// 授权的区域
+        /// 许可
         /// </summary>
-        public IEnumerable<string>? Areas { get; set; }
+        public IEnumerable<Permission>? Permissions { get; set; }
 
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public IEnumerable<Tag>? Tags { get; set; }
+
+        /// <summary>
+        /// 默认构造
+        /// </summary>
         public UserInfo()
         {
         }
@@ -52,39 +60,48 @@ namespace IceCoffee.AspNetCore.Models
         /// <param name="claims"></param>
         public UserInfo(IEnumerable<Claim> claims)
         {
+            var permissions = new List<Permission>();
+            var tags = new List<Tag>();
             foreach (var claim in claims)
             {
-                switch (claim.Type)
+                if(claim.Type == RegisteredClaimNames.UserId)
                 {
-                    case RegisteredClaimNames.UserId:
-                        UserId = claim.Value;
-                        break;
-
-                    case RegisteredClaimNames.UserName:
-                        UserName = claim.Value;
-                        break;
-
-                    case RegisteredClaimNames.DisplayName:
-                        DisplayName = claim.Value;
-                        break;
-
-                    case RegisteredClaimNames.RoleNames:
-                        RoleNames = claim.Value.Split(',');
-                        break;
-
-                    case RegisteredClaimNames.Email:
-                        Email = claim.Value;
-                        break;
-
-                    case RegisteredClaimNames.PhoneNumber:
-                        PhoneNumber = claim.Value;
-                        break;
-
-                    case RegisteredClaimNames.Areas:
-                        Areas = claim.Value.Split(',');
-                        break;
+                    UserId = claim.Value;
+                }
+                else if (claim.Type == RegisteredClaimNames.UserName)
+                {
+                    UserName = claim.Value;
+                }
+                else if (claim.Type == RegisteredClaimNames.DisplayName)
+                {
+                    DisplayName = claim.Value;
+                }
+                else if (claim.Type == RegisteredClaimNames.RoleNames)
+                {
+                    RoleNames = claim.Value.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                }
+                else if (claim.Type == RegisteredClaimNames.Email)
+                {
+                    Email = claim.Value;
+                }
+                else if (claim.Type == RegisteredClaimNames.PhoneNumber)
+                {
+                    PhoneNumber = claim.Value;
+                }
+                else if (claim.Type.StartsWith(RegisteredClaimNames.PermissionPrefix))
+                {
+                    string uri = claim.Type.Substring(RegisteredClaimNames.PermissionPrefix.Length);
+                    permissions.Add(new Permission() { Uri = uri, AllowedHttpMethods = claim.Value });
+                }
+                else if (claim.Type.StartsWith(RegisteredClaimNames.TagPrefix))
+                {
+                    string name = claim.Type.Substring(RegisteredClaimNames.TagPrefix.Length);
+                    tags.Add(new Tag() { Name = name, Value = claim.Value });
                 }
             }
+
+            Permissions = permissions;
+            Tags = tags;
         }
 
         /// <summary>
@@ -125,9 +142,20 @@ namespace IceCoffee.AspNetCore.Models
                 claims.Add(new Claim(RegisteredClaimNames.PhoneNumber, this.PhoneNumber));
             }
 
-            if (this.Areas != null)
+            if (this.Permissions != null)
             {
-                claims.Add(new Claim(RegisteredClaimNames.Areas, string.Join(',', this.Areas)));
+                foreach (var item in this.Permissions)
+                {
+                    claims.Add(new Claim(RegisteredClaimNames.PermissionPrefix + item.Uri, item.AllowedHttpMethods));
+                }
+            }
+
+            if (this.Tags != null)
+            {
+                foreach (var item in this.Tags)
+                {
+                    claims.Add(new Claim(RegisteredClaimNames.TagPrefix + item.Name, item.Value));
+                }
             }
 
             return claims;

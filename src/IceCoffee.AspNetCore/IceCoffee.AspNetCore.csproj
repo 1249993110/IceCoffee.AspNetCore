@@ -11,25 +11,27 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<LangVersion>10.0</LangVersion>
-		<!--取消方法注释警告-->
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<!--取消字段退出构造方法可空警告-->
-		<NoWarn>$(NoWarn);CS8618</NoWarn>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageProjectUrl>https://github.com/1249993110/IceCoffee.AspNetCore</PackageProjectUrl>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
-		<Version>1.1.5</Version>
+		<Version>1.2.0</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-		<PackageReference Include="NSwag.AspNetCore" Version="13.20.0" />
-		<PackageReference Include="IceCoffee.Common" Version="1.0.5" />
-		<!--<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />-->
-		<!--<PackageReference Include="Mapster" Version="7.3.0" />-->
-		<!--<PackageReference Include="FastExpressionCompiler" Version="3.3.4" />-->
+		<PackageReference Include="NSwag.AspNetCore" Version="14.0.2" />
+		<PackageReference Include="IceCoffee.Common" Version="1.0.6" />
+		<PackageReference Include="AlibabaCloud.SDK.Dysmsapi20170525" Version="2.0.24" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.26" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

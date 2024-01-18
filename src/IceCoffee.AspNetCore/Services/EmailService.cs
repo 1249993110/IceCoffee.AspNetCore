@@ -1,4 +1,5 @@
-﻿using IceCoffee.AspNetCore.Options;
+﻿using IceCoffee.AspNetCore.Models;
+using IceCoffee.AspNetCore.Options;
 using IceCoffee.Common.Templates;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
@@ -12,38 +13,33 @@ namespace IceCoffee.AspNetCore.Services
     {
         private readonly SmtpOptions _smtpOptions;
 
-        public EmailService(SmtpOptions smtpOptions)
-        {
-            _smtpOptions = smtpOptions;
-        }
-
         public EmailService(IOptions<SmtpOptions> smtpOptions)
         {
             _smtpOptions = smtpOptions.Value;
         }
 
-        public virtual async Task SendAsync(EmailSendOptions emailSendParam)
+        public virtual async Task SendAsync(EmailSendArgs emailSendArgs)
         {
             try
             {
-                if (emailSendParam == null)
+                if (emailSendArgs == null)
                 {
-                    throw new ArgumentNullException(nameof(emailSendParam));
+                    throw new ArgumentNullException(nameof(emailSendArgs));
                 }
 
-                if (string.IsNullOrEmpty(emailSendParam.FromAddress))
+                if (string.IsNullOrEmpty(emailSendArgs.FromAddress))
                 {
-                    throw new ArgumentNullException(nameof(EmailSendOptions.FromAddress));
+                    throw new ArgumentNullException(nameof(EmailSendArgs.FromAddress));
                 }
 
-                if (string.IsNullOrEmpty(emailSendParam.ToAddress))
+                if (string.IsNullOrEmpty(emailSendArgs.ToAddress))
                 {
-                    throw new ArgumentNullException(nameof(EmailSendOptions.ToAddress));
+                    throw new ArgumentNullException(nameof(EmailSendArgs.ToAddress));
                 }
 
-                if (string.IsNullOrEmpty(emailSendParam.TemplateFilePath))
+                if (string.IsNullOrEmpty(emailSendArgs.TemplateFilePath))
                 {
-                    throw new ArgumentNullException(nameof(EmailSendOptions.TemplateFilePath));
+                    throw new ArgumentNullException(nameof(EmailSendArgs.TemplateFilePath));
                 }
 
                 // 初始化发送邮件对象
@@ -57,17 +53,17 @@ namespace IceCoffee.AspNetCore.Services
                     Credentials = new NetworkCredential(_smtpOptions.UserName, _smtpOptions.Password)
                 };
 
-                string body = StringTemplate.Render(System.IO.File.ReadAllText(emailSendParam.TemplateFilePath), emailSendParam);
+                string body = StringTemplate.Render(System.IO.File.ReadAllText(emailSendArgs.TemplateFilePath), emailSendArgs);
 
                 // 要发送的邮件对象
                 var email = new MailMessage()
                 {
                     // 发件人邮箱和展示名称
-                    From = new MailAddress(emailSendParam.FromAddress, emailSendParam.FromDisplayName, Encoding.UTF8),
+                    From = new MailAddress(emailSendArgs.FromAddress, emailSendArgs.FromDisplayName, Encoding.UTF8),
                     // 是否是html格式
-                    IsBodyHtml = emailSendParam.IsBodyHtml,
+                    IsBodyHtml = emailSendArgs.IsBodyHtml,
                     // 邮件标题
-                    Subject = emailSendParam.Subject,
+                    Subject = emailSendArgs.Subject,
                     // 邮件内容编码
                     BodyEncoding = Encoding.UTF8,
                     // 邮件内容
@@ -76,7 +72,7 @@ namespace IceCoffee.AspNetCore.Services
                     Priority = MailPriority.Normal
                 };
                 // 收件人（可以多个）
-                email.To.Add(emailSendParam.ToAddress);
+                email.To.Add(emailSendArgs.ToAddress);
 
                 AsyncCompletedEventArgs? result = null;
 

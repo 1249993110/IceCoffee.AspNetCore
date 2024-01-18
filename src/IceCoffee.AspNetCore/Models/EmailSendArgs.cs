@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IceCoffee.AspNetCore.Options
+﻿namespace IceCoffee.AspNetCore.Models
 {
-    public class EmailSendOptions
+    /// <summary>
+    /// 邮件发送参数
+    /// </summary>
+    public class EmailSendArgs
     {
         /// <summary>
         /// 是否是html格式
