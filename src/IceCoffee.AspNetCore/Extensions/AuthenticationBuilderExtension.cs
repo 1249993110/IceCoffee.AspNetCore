@@ -80,6 +80,8 @@ namespace IceCoffee.AspNetCore.Extensions
                 RoleClaimType = RegisteredClaimNames.RoleNames
             };
 
+            services.AddSingleton(tokenValidationParams);
+
             return services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

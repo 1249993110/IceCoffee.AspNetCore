@@ -103,8 +103,36 @@ namespace IceCoffee.AspNetCore.Extensions
         /// <param name="configurationSectionPath"></param>
         public static void AddEmailService(this IServiceCollection services, string configurationSectionPath)
         {
-            services.AddOptions<SmtpOptions>().BindConfiguration(configurationSectionPath);
+            services.AddOptions<SmtpOptions>()
+                .BindConfiguration(configurationSectionPath)
+                .ValidateDataAnnotations()
+                .ValidateOnStart(); ;
             services.TryAddTransient<EmailService>();
+        }
+
+        /// <summary>
+        /// 添加阿里云短信服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configure"></param>
+        public static void AddAliCloudSmsService(this IServiceCollection services, Action<AliCloudSmsOptions> configure)
+        {
+            services.AddOptions<AliCloudSmsOptions>().Configure(configure);
+            services.TryAddTransient<AliCloudSmsService>();
+        }
+
+        /// <summary>
+        /// 添加阿里云短信服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configurationSectionPath"></param>
+        public static void AddAliCloudSmsService(this IServiceCollection services, string configurationSectionPath)
+        {
+            services.AddOptions<AliCloudSmsOptions>()
+                .BindConfiguration(configurationSectionPath)
+                .ValidateDataAnnotations()
+                .ValidateOnStart(); ;
+            services.TryAddTransient<AliCloudSmsService>();
         }
     }
 }

@@ -9,15 +9,29 @@ using System.Text;
 
 namespace IceCoffee.AspNetCore.Services
 {
+    /// <summary>
+    /// 邮件服务
+    /// </summary>
     public class EmailService
     {
-        private readonly SmtpOptions _smtpOptions;
+        private readonly SmtpOptions _options;
 
-        public EmailService(IOptions<SmtpOptions> smtpOptions)
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="options"></param>
+        public EmailService(IOptions<SmtpOptions> options)
         {
-            _smtpOptions = smtpOptions.Value;
+            _options = options.Value;
         }
 
+        /// <summary>
+        /// 发送邮件
+        /// </summary>
+        /// <param name="emailSendArgs"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Exception"></exception>
         public virtual async Task SendAsync(EmailSendArgs emailSendArgs)
         {
             try
@@ -43,14 +57,14 @@ namespace IceCoffee.AspNetCore.Services
                 }
 
                 // 初始化发送邮件对象
-                var client = new SmtpClient(_smtpOptions.Host, _smtpOptions.Port)
+                var client = new SmtpClient(_options.Host, _options.Port)
                 {
                     // 是否启用SSL
-                    EnableSsl = _smtpOptions.EnableSsl,
+                    EnableSsl = _options.EnableSsl,
                     // 是否启用身份验证（UseDefaultCredentials属性必须要在Credentials前配置, 否则会报错）
-                    UseDefaultCredentials = _smtpOptions.UseDefaultCredentials,
+                    UseDefaultCredentials = _options.UseDefaultCredentials,
                     // 配置身份账号密码
-                    Credentials = new NetworkCredential(_smtpOptions.UserName, _smtpOptions.Password)
+                    Credentials = new NetworkCredential(_options.UserName, _options.Password)
                 };
 
                 string body = StringTemplate.Render(System.IO.File.ReadAllText(emailSendArgs.TemplateFilePath), emailSendArgs);
