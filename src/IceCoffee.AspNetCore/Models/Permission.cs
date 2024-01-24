@@ -6,7 +6,7 @@
     public struct Permission
     {
         /// <summary>
-        /// 斜杆: '/' 开头, '*' 代表允许所有子路径
+        /// 斜杆: '/' 开头, '/' 代表允许所有子路径
         /// </summary>
         public string Uri { get; set; }
 
