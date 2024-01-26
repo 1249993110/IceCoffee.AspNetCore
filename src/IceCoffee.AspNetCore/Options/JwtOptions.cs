@@ -27,5 +27,15 @@ namespace IceCoffee.AspNetCore.Options
         /// 刷新令牌过期时长, 单位: 秒, 默认为一周
         /// </summary>
         public int RefreshTokenExpires { get; set; } = 604800;
+
+        /// <summary>
+        /// 是否校验被颁发者
+        /// </summary>
+        public bool ValidateAudience { get; set; } = true;
+
+        /// <summary>
+        /// 被颁发者
+        /// </summary>
+        public string? ValidAudience { get; set; }
     }
 }

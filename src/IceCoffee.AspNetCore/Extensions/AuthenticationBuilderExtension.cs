@@ -65,7 +65,9 @@ namespace IceCoffee.AspNetCore.Extensions
                 // 是否校验颁发者
                 ValidateIssuer = false,
                 // 是否校验被颁发者
-                ValidateAudience = false,
+                ValidateAudience = jwtOptions.ValidateAudience,
+                // 被颁发者
+                ValidAudience = jwtOptions.ValidAudience,
                 // 安全令牌
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 // 缓冲过期时间偏移量
