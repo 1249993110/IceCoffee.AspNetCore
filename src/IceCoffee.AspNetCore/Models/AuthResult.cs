@@ -37,8 +37,38 @@
         public bool RequirePasswordChange { get; set; }
 
         /// <summary>
+        /// 用户Id
+        /// </summary>
+        public string? UserId { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string? UserName { get; set; }
+
+        /// <summary>
         /// 显示名称
         /// </summary>
-        public string DisplayName { get; set; } = null!;
+        public string? DisplayName { get; set; }
+
+        /// <summary>
+        /// 角色名
+        /// </summary>
+        public IEnumerable<string>? RoleNames { get; set; }
+
+        /// <summary>
+        /// Email
+        /// </summary>
+        public string? Email { get; set; }
+
+        /// <summary>
+        /// 电话号码
+        /// </summary>
+        public string? PhoneNumber { get; set; }
+
+        /// <summary>
+        /// 标签
+        /// </summary>
+        public IEnumerable<Tag>? Tags { get; set; }
     }
 }
