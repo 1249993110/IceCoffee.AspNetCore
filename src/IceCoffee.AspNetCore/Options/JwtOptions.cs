@@ -14,9 +14,9 @@ namespace IceCoffee.AspNetCore.Options
         public string SecretKey { get; set; } = null!;
 
         /// <summary>
-        /// 缓冲过期时间, 总的有效时间等于这个时间加上jwt的过期时间
+        /// 缓冲过期时间, 总的有效时间等于这个时间加上jwt的过期时间, 单位: 秒, 默认60秒
         /// </summary>
-        public int ClockSkew { get; set; }
+        public int ClockSkew { get; set; } = 60;
 
         /// <summary>
         /// 访问令牌过期时长, 单位: 秒, 默认10分钟

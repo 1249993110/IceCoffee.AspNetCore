@@ -35,5 +35,10 @@
         /// 要求用户更改密码
         /// </summary>
         public bool RequirePasswordChange { get; set; }
+
+        /// <summary>
+        /// 显示名称
+        /// </summary>
+        public string DisplayName { get; set; } = null!;
     }
 }
