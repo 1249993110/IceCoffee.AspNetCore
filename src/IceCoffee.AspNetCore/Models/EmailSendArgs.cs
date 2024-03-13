@@ -31,14 +31,14 @@
         public string? TemplateFilePath { get; set; }
 
         /// <summary>
-        /// 验证码
-        /// </summary>
-        public string? Captcha { get; set; }
-
-        /// <summary>
         /// 目标邮箱地址
         /// </summary>
         public string? ToAddress { get; set; }
+
+        /// <summary>
+        /// 验证码
+        /// </summary>
+        public string? Captcha { get; set; }
 
         /// <summary>
         /// 目标用户昵称
