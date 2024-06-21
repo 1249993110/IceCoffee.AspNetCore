@@ -28,8 +28,8 @@ namespace IceCoffee.AspNetCore.Options
         /// <summary>
         /// 
         /// </summary>
-        [DefaultValue(true)]
-        public bool UseDefaultCredentials { get; set; } = true;
+        [DefaultValue(false)]
+        public bool UseDefaultCredentials { get; set; } = false;
 
         /// <summary>
         /// 用户名
