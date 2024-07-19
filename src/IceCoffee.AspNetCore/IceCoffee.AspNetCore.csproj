@@ -16,7 +16,7 @@
 		<PackageProjectUrl>https://github.com/1249993110/IceCoffee.AspNetCore</PackageProjectUrl>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<RepositoryUrl>https://github.com/1249993110/IceCoffee.AspNetCore</RepositoryUrl>
-		<Version>1.2.1</Version>
+		<Version>1.2.2</Version>
 	</PropertyGroup>
 
 	<ItemGroup>

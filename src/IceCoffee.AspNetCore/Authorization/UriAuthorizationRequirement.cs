@@ -33,7 +33,7 @@ namespace IceCoffee.AspNetCore.Authorization
                     string uri = claim.Type.Substring(RegisteredClaimNames.PermissionPrefix.Length);
                     string allowedHttpMethods = claim.Value;
 
-                    if (uri == "/" || httpContext.Request.Path.StartsWithSegments(new PathString(uri)))
+                    if (uri == "/" || (httpContext.Request.PathBase + httpContext.Request.Path).StartsWithSegments(new PathString(uri)))
                     {
                         if (allowedHttpMethods == HttpMethods.Any || allowedHttpMethods.Split(',').Contains(httpContext.Request.Method))
                         {
