@@ -5,7 +5,9 @@ using idunno.Authentication.Basic;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +34,15 @@ namespace IceCoffee.AspNetCore
     public class StartupBase
     {
         /// <summary>
+        /// Tracks whether any authentication scheme was registered during <see cref="ConfigureAuthentication"/>.
+        /// Used to gate the global <see cref="AuthorizeFilter"/> and the authentication/authorisation
+        /// middleware so that neither is added when no scheme is configured, avoiding the
+        /// <see cref="InvalidOperationException"/> thrown by ASP.NET Core when a challenge is issued
+        /// without a default scheme.
+        /// </summary>
+        private bool _authenticationConfigured;
+        
+        /// <summary>
         /// The application configuration sourced from <c>appsettings.json</c>, environment variables,
         /// and other registered providers. Used throughout service registration to read feature flags
         /// such as <c>EnableSwagger</c>, <c>EnableCors</c>, and <c>BasicAuthOptions</c>.
@@ -56,51 +67,31 @@ namespace IceCoffee.AspNetCore
         }
 
         /// <summary>
-        /// Registers all framework and application services into the DI container.
-        /// Applies a global <see cref="AuthorizeFilter"/> so every controller endpoint requires
-        /// authentication by default, and conditionally wires up Basic Auth, Swagger (NSwag),
-        /// CORS, Serilog, Mapster, and response caching based on configuration flags.
+        /// Registers the authentication scheme(s) for this application. Override this method in a
+        /// derived class to replace the default HTTP Basic Auth with any other scheme (OAuth2, OIDC,
+        /// JWT Bearer, etc.). The return value controls whether the global <see cref="AuthorizeFilter"/>
+        /// and the <c>UseAuthentication</c> / <c>UseAuthorization</c> middleware are activated;
+        /// return <see langword="false"/> only when the application intentionally has no authentication.
         /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> to register services into.</param>
-        public virtual void ConfigureServices(IServiceCollection services)
+        /// <param name="services">The <see cref="IServiceCollection"/> to register authentication services into.</param>
+        /// <returns>
+        /// <see langword="true"/> if at least one authentication scheme was registered;
+        /// <see langword="false"/> if authentication should be skipped entirely.
+        /// </returns>
+        protected virtual bool ConfigureAuthentication(IServiceCollection services)
         {
-            // Add services to the container.
-            services.AddControllers(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            }).AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
-            });
-
-            services.AddMemoryCache();
-            services.AddProblemDetails(options =>
-            {
-                options.CustomizeProblemDetails = ctx =>
-                {
-                    if (ctx.Exception is not null && Environment.IsDevelopment())
-                    {
-                        ctx.ProblemDetails.Detail = ctx.Exception.Message;
-                    }
-                };
-            });
-            services.AddSingleton<FileExtensionContentTypeProvider>();
-
-            #region Authentication and Authorization
             var basicAuthOptions = Configuration.GetSection("BasicAuthOptions").Get<BasicAuthOptions>();
-            bool enableBasicAuth = basicAuthOptions != null && basicAuthOptions.Enabled;
-            if (enableBasicAuth)
+            if (basicAuthOptions == null || !basicAuthOptions.Enabled)
             {
-                services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
+                return false;
+            }
+
+            services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
                 .AddBasic(options =>
                 {
-                    options.Realm = basicAuthOptions!.Realm;
+                    options.Realm = basicAuthOptions.Realm;
                     options.AllowInsecureProtocol = true;
-                    options.Events = new BasicAuthenticationEvents()
+                    options.Events = new BasicAuthenticationEvents
                     {
                         OnValidateCredentials = context =>
                         {
@@ -121,9 +112,75 @@ namespace IceCoffee.AspNetCore
                     };
                 });
 
+            return true;
+        }
+
+        /// <summary>
+        /// Adds the authentication-related security definition and operation processor to the NSwag
+        /// document configuration. Called only when <see cref="ConfigureAuthentication"/> returned
+        /// <see langword="true"/>. Override this method in a derived class to replace the default
+        /// Basic Auth Swagger security definition with one that matches the scheme registered in
+        /// <see cref="ConfigureAuthentication"/> (e.g. Bearer/JWT, OAuth2, API key).
+        /// </summary>
+        /// <param name="config">
+        /// The NSwag <see cref="NSwag.Generation.AspNetCore.AspNetCoreOpenApiDocumentGeneratorSettings"/> being configured.
+        /// </param>
+        protected virtual void ConfigureSwaggerSecurity(NSwag.Generation.AspNetCore.AspNetCoreOpenApiDocumentGeneratorSettings config)
+        {
+            config.AddSecurity(BasicAuthenticationDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                Type = OpenApiSecuritySchemeType.Basic,
+                Scheme = BasicAuthenticationDefaults.AuthenticationScheme
+            });
+
+            config.OperationProcessors.Add(
+                new NSwag.Generation.Processors.Security.OperationSecurityScopeProcessor(
+                    BasicAuthenticationDefaults.AuthenticationScheme));
+        }
+
+
+        /// <summary>
+        /// Registers all framework and application services into the DI container.
+        /// Calls <see cref="ConfigureAuthentication"/> first and uses its result to conditionally
+        /// apply the global <see cref="AuthorizeFilter"/>, Swagger security definitions, and the
+        /// authentication/authorisation middleware — preventing the
+        /// <see cref="InvalidOperationException"/> that ASP.NET Core throws when a challenge is
+        /// issued without a registered default scheme.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to register services into.</param>
+        public virtual void ConfigureServices(IServiceCollection services)
+        {
+            // Delegate authentication setup to the virtual method so subclasses can swap in
+            // any scheme (OAuth2, OIDC, JWT, etc.) without touching the rest of the pipeline.
+            _authenticationConfigured = ConfigureAuthentication(services);
+            if (_authenticationConfigured)
+            {
                 services.AddAuthorization();
             }
-            #endregion
+
+            // Add services to the container.
+            services.AddControllers(config =>
+            {
+                // Only enforce global authentication when a scheme has actually been registered;
+                // otherwise ASP.NET Core throws InvalidOperationException on the first challenge.
+                if (_authenticationConfigured)
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                    config.Filters.Add(new AuthorizeFilter(policy));
+                }
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+            });
+
+            services.AddMemoryCache();
+            services.AddProblemDetails();
+            services.AddExceptionHandler<CustomExceptionHandler>();
+
+            services.AddSingleton<FileExtensionContentTypeProvider>();
 
             services.Configure((FormOptions option) =>
             {
@@ -156,15 +213,9 @@ namespace IceCoffee.AspNetCore
                     // You can set it to load from an annotation file, but the loaded content can be overwritten by the OpenApiTagAttribute attribute.
                     config.UseControllerSummaryAsTagDescription = true;
 
-                    if (enableBasicAuth)
+                    if (_authenticationConfigured)
                     {
-                        config.AddSecurity(BasicAuthenticationDefaults.AuthenticationScheme, new OpenApiSecurityScheme()
-                        {
-                            Type = OpenApiSecuritySchemeType.Basic,
-                            Scheme = BasicAuthenticationDefaults.AuthenticationScheme
-                        });
-
-                        config.OperationProcessors.Add(new NSwag.Generation.Processors.Security.OperationSecurityScopeProcessor(BasicAuthenticationDefaults.AuthenticationScheme));
+                        ConfigureSwaggerSecurity(config);
                     }
                 });
             }
@@ -296,9 +347,9 @@ namespace IceCoffee.AspNetCore
                 app.UseCors("Cors");
             }
 
-            app.UseResponseCaching();
+            //app.UseResponseCaching();
 
-            if (Configuration.GetValue<bool>("BasicAuthOptions:Enabled"))
+            if (_authenticationConfigured)
             {
                 app.UseAuthentication();
                 app.UseAuthorization();
