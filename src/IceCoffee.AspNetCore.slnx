@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/解决方案项/">
+    <File Path="../LICENSE" />
+    <File Path="../README.md" />
+  </Folder>
+  <Project Path="IceCoffee.AspNetCore/IceCoffee.AspNetCore.csproj" />
+</Solution>
